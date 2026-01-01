@@ -1,0 +1,175 @@
+.dialog-preview {
+  padding: 20px;
+  height: 100%;
+  overflow-y: auto;
+  background: #1e1e1e;
+}
+
+.dialog-preview h2 {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #cccccc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 对话容器 */
+.dialog-container {
+  margin-bottom: 24px;
+}
+
+.speaker-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4fc3f7;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background: rgba(79, 195, 247, 0.1);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.dialog-box {
+  background: #252526;
+  border: 1px solid #3e3e42;
+  border-radius: 8px;
+  padding: 16px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.dialog-text {
+  font-size: 15px;
+  line-height: 1.8;
+  color: #d4d4d4;
+}
+
+.dialog-line {
+  margin-bottom: 8px;
+}
+
+.dialog-line:last-child {
+  margin-bottom: 0;
+}
+
+/* Ruby 注音 */
+ruby {
+  ruby-position: over;
+}
+
+ruby rt {
+  font-size: 0.6em;
+  color: #858585;
+}
+
+/* 语音指示器 */
+.voice-indicator {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #3e3e42;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #81c784;
+}
+
+.voice-icon {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.voice-file {
+  font-family: 'Consolas', 'Monaco', monospace;
+  background: #1e1e1e;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* 时间信息 */
+.dialog-timing {
+  margin-top: 12px;
+  display: flex;
+  gap: 16px;
+  font-size: 11px;
+  color: #858585;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+/* 无对话状态 */
+.no-dialog {
+  text-align: center;
+  padding: 60px 20px;
+  color: #858585;
+}
+
+.no-dialog-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.no-dialog p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* 对话历史 */
+.dialog-history {
+  margin-top: 32px;
+  padding-top: 20px;
+  border-top: 1px solid #3e3e42;
+}
+
+.dialog-history h3 {
+  margin: 0 0 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #858585;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  padding: 10px;
+  background: #252526;
+  border: 1px solid #3e3e42;
+  border-radius: 6px;
+  font-size: 12px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background: #2d2d30;
+}
+
+.history-time {
+  font-family: 'Consolas', 'Monaco', monospace;
+  color: #858585;
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+
+.history-speaker {
+  font-weight: 600;
+  color: #4fc3f7;
+  margin-bottom: 4px;
+}
+
+.history-text {
+  color: #cccccc;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

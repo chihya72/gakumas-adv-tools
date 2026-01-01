@@ -1,0 +1,11 @@
+# Gakumas ADV Tools - Python Dependencies
+
+# Parser dependencies
+tqdm>=4.66.0
+
+# API Server dependencies
+Flask>=3.0.0
+flask-cors>=4.0.0
+
+# Database dependencies (included in Python standard library)
+# sqlite3 (built-in)

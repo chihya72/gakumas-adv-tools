@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资源选择器演示 - Gakumas ADV Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #4ec9b0;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #858585;
+            margin-bottom: 30px;
+        }
+
+        .demo-section {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .demo-section h2 {
+            color: #569cd6;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #9cdcfe;
+            font-size: 14px;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            background: #3c3c3c;
+            border: 1px solid #555;
+            border-radius: 4px;
+            color: #d4d4d4;
+            font-size: 14px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #007acc;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: #0e639c;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        button:hover {
+            background: #1177bb;
+        }
+
+        button:active {
+            background: #0d5a8f;
+        }
+
+        .result-box {
+            background: #1e1e1e;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .result-box pre {
+            color: #ce9178;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+
+        .resource-list {
+            list-style: none;
+        }
+
+        .resource-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #2d2d30;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .resource-item:hover {
+            background: #3e3e42;
+        }
+
+        .resource-item.selected {
+            background: #094771;
+            border-left: 3px solid #007acc;
+        }
+
+        .resource-type {
+            color: #4ec9b0;
+            font-size: 12px;
+        }
+
+        .character-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #6a329f;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background: #2d2d30;
+            padding: 12px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            color: #4ec9b0;
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #858585;
+            margin-top: 5px;
+        }
+
+        .loading {
+            color: #858585;
+            font-style: italic;
+        }
+
+        .error {
+            color: #f48771;
+        }
+
+        .success {
+            color: #89d185;
+        }
+
+        .inline-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .inline-group .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Gakumas ADV 资源选择器演示</h1>
+        <p class="subtitle">演示如何在Web编辑器中使用资源数据库API</p>
+
+        <!-- 角色模型选择 -->
+        <div class="demo-section">
+            <h2>1. 角色模型选择器 (Actor Models)</h2>
+            <div class="inline-group">
+                <div class="form-group">
+                    <label>选择角色:</label>
+                    <select id="characterSelect">
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>模型类型:</label>
+                    <select id="modelTypeSelect">
+                        <option value="">全部</option>
+                        <option value="body">Body (身体)</option>
+                        <option value="face">Face (面部)</option>
+                        <option value="hair">Hair (发型)</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="loadModels()">加载模型列表</button>
+            <div class="result-box" id="modelsResult">
+                <p class="loading">请先选择角色和类型...</p>
+            </div>
+        </div>
+
+        <!-- 动作选择 -->
+        <div class="demo-section">
+            <h2>2. 动作选择器 (Actor Motion / Facial Motion)</h2>
+            <div class="inline-group">
+                <div class="form-group">
+                    <label>动作分类:</label>
+                    <select id="motionCategorySelect" onchange="loadMotionCharacters()">
+                        <option value="">请选择动作分类...</option>
+                        <option value="actor">角色动作 (Actor Motion)</option>
+                        <option value="facial">面部表情 (Facial Motion)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="motionCharacterGroup" style="display: none;">
+                    <label>选择角色:</label>
+                    <select id="motionCharacterSelect">
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>行为类型:</label>
+                    <select id="actionTypeSelect">
+                        <option value="">全部</option>
+                        <option value="idle">Idle (待机)</option>
+                        <option value="walk">Walk (行走)</option>
+                        <option value="dance">Dance (跳舞)</option>
+                        <option value="emotion">Emotion (情绪)</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="loadMotions()">加载动作列表</button>
+            <div class="result-box" id="motionsResult">
+                <p class="loading">请先选择动作类型...</p>
+            </div>
+        </div>
+
+        <!-- 环境场景选择 -->
+        <div class="demo-section">
+            <h2>3. 环境场景选择器 (Backgrounds)</h2>
+            <div class="inline-group">
+                <div class="form-group">
+                    <label>场景类型:</label>
+                    <select id="envTypeSelect">
+                        <option value="">全部</option>
+                        <option value="2d">2D场景</option>
+                        <option value="3d">3D场景</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>时间:</label>
+                    <select id="timeOfDaySelect">
+                        <option value="">全部</option>
+                        <option value="noon">Noon (中午)</option>
+                        <option value="night">Night (夜晚)</option>
+                        <option value="evening">Evening (傍晚)</option>
+                        <option value="morning">Morning (早晨)</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="loadEnvironments()">加载场景列表</button>
+            <div class="result-box" id="environmentsResult">
+                <p class="loading">请先选择场景类型...</p>
+            </div>
+        </div>
+
+        <!-- 搜索功能 -->
+        <div class="demo-section">
+            <h2>4. 资源搜索</h2>
+            <div class="form-group">
+                <label>搜索关键词:</label>
+                <input type="text" id="searchInput" placeholder="输入关键词，如 'amao', 'glad', 'night'...">
+            </div>
+            <button onclick="searchResources()">搜索</button>
+            <div class="result-box" id="searchResult">
+                <p class="loading">输入关键词后点击搜索...</p>
+            </div>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="demo-section">
+            <h2>5. 数据库统计</h2>
+            <button onclick="loadStats()">加载统计信息</button>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card loading">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api';
+
+        // 角色ID到中文名的映射
+        const CHARACTER_NAMES = {
+            'amao': '有村麻央',
+            'atbm': '雨夜燕',
+            'fktn': '藤田琴音',
+            'hmsz': '秦谷美铃',
+            'hrnm': '姬崎莉波',
+            'hski': '花海咲季',
+            'hume': '花海佑芽',
+            'jsna': '十王星南',
+            'kcna': '仓本千奈',
+            'kllj': '葛城莉莉娅',
+            'nasr': '根绪亚纱里',
+            'shro': '筱泽广',
+            'ssmk': '紫云清夏',
+            'trda': '舞蹈训练员',
+            'trvi': '视觉训练员',
+            'trvo': '歌唱训练员',
+            'ttmr': '月村手毬',
+            'cmmn': '角色通用'
+        };
+
+        // 获取角色显示名称
+        function getCharacterDisplayName(charId) {
+            const cnName = CHARACTER_NAMES[charId];
+            return cnName ? `${charId.toUpperCase()} (${cnName})` : charId.toUpperCase();
+        }
+
+        // 初始化：加载角色列表
+        async function init() {
+            try {
+                const response = await fetch(`${API_BASE}/characters`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const select = document.getElementById('characterSelect');
+                    select.innerHTML = '<option value="">全部角色</option>';
+                    data.data.forEach(charId => {
+                        const option = document.createElement('option');
+                        option.value = charId;
+                        option.textContent = getCharacterDisplayName(charId);
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('加载角色列表失败:', error);
+                document.getElementById('characterSelect').innerHTML = 
+                    '<option value="">加载失败 - 请启动API服务器</option>';
+            }
+        }
+
+        // 加载模型列表
+        async function loadModels() {
+            const characterId = document.getElementById('characterSelect').value;
+            const modelType = document.getElementById('modelTypeSelect').value;
+            const resultBox = document.getElementById('modelsResult');
+
+            resultBox.innerHTML = '<p class="loading">加载中...</p>';
+
+            try {
+                let url = `${API_BASE}/resources/models?`;
+                if (characterId) url += `character_id=${characterId}&`;
+                if (modelType) url += `model_type=${modelType}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    const list = document.createElement('ul');
+                    list.className = 'resource-list';
+
+                    data.data.forEach(model => {
+                        const li = document.createElement('li');
+                        li.className = 'resource-item';
+                        li.onclick = () => selectResource(li, model.model_name);
+                        const charDisplay = model.character_id ? getCharacterDisplayName(model.character_id) : 'common';
+                        li.innerHTML = `
+                            <div>${model.model_name}</div>
+                            <div class="resource-type">
+                                ${model.model_type}
+                                <span class="character-badge">${charDisplay}</span>
+                            </div>
+                        `;
+                        list.appendChild(li);
+                    });
+
+                    resultBox.innerHTML = `<p class="success">找到 ${data.count} 个模型</p>`;
+                    resultBox.appendChild(list);
+                } else {
+                    resultBox.innerHTML = '<p class="error">未找到符合条件的模型</p>';
+                }
+            } catch (error) {
+                resultBox.innerHTML = `<p class="error">加载失败: ${error.message}</p>`;
+            }
+        }
+
+        // 加载动作角色列表（根据分类动态加载）
+        async function loadMotionCharacters() {
+            const category = document.getElementById('motionCategorySelect').value;
+            const characterGroup = document.getElementById('motionCharacterGroup');
+            const characterSelect = document.getElementById('motionCharacterSelect');
+            const resultBox = document.getElementById('motionsResult');
+            
+            // 清空结果
+            resultBox.innerHTML = '<p class="loading">请先选择角色...</p>';
+            
+            if (!category) {
+                characterGroup.style.display = 'none';
+                return;
+            }
+            
+            // 显示角色选择框
+            characterGroup.style.display = 'block';
+            characterSelect.innerHTML = '<option value="">加载中...</option>';
+            
+            try {
+                // 根据分类设置motion_type
+                let motionType = '';
+                if (category === 'actor') {
+                    // 角色动作：包括common和character
+                    motionType = '';  // 不限制类型，后面会筛选
+                } else if (category === 'facial') {
+                    motionType = 'facial';
+                }
+                
+                // 调用API获取该类型的所有动作
+                let url = `${API_BASE}/resources/motions?`;
+                if (motionType) url += `motion_type=${motionType}`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.success) {
+                    // 提取唯一的角色ID
+                    const characterIds = new Set();
+                    data.data.forEach(motion => {
+                        if (category === 'actor') {
+                            // 角色动作：只要character类型（包括cmmn）
+                            if (motion.motion_type === 'character') {
+                                if (motion.character_id) {
+                                    characterIds.add(motion.character_id);
+                                }
+                            }
+                        } else if (category === 'facial') {
+                            // 面部表情
+                            if (motion.character_id) {
+                                characterIds.add(motion.character_id);
+                            }
+                        }
+                    });
+                    
+                    // 填充下拉选单
+                    characterSelect.innerHTML = '<option value="">全部角色</option>';
+                    
+                    // 排序并添加选项
+                    const sortedIds = Array.from(characterIds).sort();
+                    sortedIds.forEach(charId => {
+                        const option = document.createElement('option');
+                        option.value = charId;
+                        if (charId === 'cmmn') {
+                            option.textContent = 'CMMN (通用)';
+                        } else {
+                            option.textContent = getCharacterDisplayName(charId);
+                        }
+                        characterSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                characterSelect.innerHTML = '<option value="">加载失败</option>';
+                console.error('加载角色列表失败:', error);
+            }
+        }
+
+        // 加载动作列表
+        async function loadMotions() {
+            const category = document.getElementById('motionCategorySelect').value;
+            const motionCharacterId = document.getElementById('motionCharacterSelect').value;
+            const actionType = document.getElementById('actionTypeSelect').value;
+            const resultBox = document.getElementById('motionsResult');
+
+            if (!category) {
+                resultBox.innerHTML = '<p class="error">请先选择动作分类</p>';
+                return;
+            }
+
+            resultBox.innerHTML = '<p class="loading">加载中...</p>';
+
+            try {
+                let url = `${API_BASE}/resources/motions?`;
+                
+                // 根据分类设置motion_type
+                if (category === 'facial') {
+                    url += `motion_type=facial&`;
+                } else if (category === 'actor') {
+                    // 角色动作不限制motion_type，让后端返回character和common
+                }
+                
+                // 设置角色ID
+                if (motionCharacterId) {
+                    // cmmn 现在也是一个 character_id
+                    url += `character_id=${motionCharacterId}&`;
+                }
+                
+                if (actionType) url += `action_type=${actionType}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    const list = document.createElement('ul');
+                    list.className = 'resource-list';
+
+                    data.data.forEach(motion => {
+                        const li = document.createElement('li');
+                        li.className = 'resource-item';
+                        li.onclick = () => selectResource(li, motion.motion_name);
+                        const charDisplay = motion.character_id ? getCharacterDisplayName(motion.character_id) : '';
+                        li.innerHTML = `
+                            <div>${motion.motion_name}</div>
+                            <div class="resource-type">
+                                ${motion.motion_type} ${motion.action_type ? `- ${motion.action_type}` : ''}
+                                ${motion.character_id ? `<span class="character-badge">${charDisplay}</span>` : ''}
+                            </div>
+                        `;
+                        list.appendChild(li);
+                    });
+
+                    resultBox.innerHTML = `<p class="success">找到 ${data.count} 个动作</p>`;
+                    resultBox.appendChild(list);
+                } else {
+                    resultBox.innerHTML = '<p class="error">未找到符合条件的动作</p>';
+                }
+            } catch (error) {
+                resultBox.innerHTML = `<p class="error">加载失败: ${error.message}</p>`;
+            }
+        }
+
+        // 加载环境列表
+        async function loadEnvironments() {
+            const envType = document.getElementById('envTypeSelect').value;
+            const timeOfDay = document.getElementById('timeOfDaySelect').value;
+            const resultBox = document.getElementById('environmentsResult');
+
+            resultBox.innerHTML = '<p class="loading">加载中...</p>';
+
+            try {
+                let url = `${API_BASE}/resources/environments?`;
+                if (envType) url += `env_type=${envType}&`;
+                if (timeOfDay) url += `time_of_day=${timeOfDay}`;
+
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    const list = document.createElement('ul');
+                    list.className = 'resource-list';
+
+                    data.data.forEach(env => {
+                        const li = document.createElement('li');
+                        li.className = 'resource-item';
+                        li.onclick = () => selectResource(li, env.env_name);
+                        li.innerHTML = `
+                            <div>${env.env_name}</div>
+                            <div class="resource-type">
+                                ${env.env_type} - ${env.location} - ${env.time_of_day}
+                            </div>
+                        `;
+                        list.appendChild(li);
+                    });
+
+                    resultBox.innerHTML = `<p class="success">找到 ${data.count} 个场景</p>`;
+                    resultBox.appendChild(list);
+                } else {
+                    resultBox.innerHTML = '<p class="error">未找到符合条件的场景</p>';
+                }
+            } catch (error) {
+                resultBox.innerHTML = `<p class="error">加载失败: ${error.message}</p>`;
+            }
+        }
+
+        // 搜索资源
+        async function searchResources() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            const resultBox = document.getElementById('searchResult');
+
+            if (!keyword) {
+                resultBox.innerHTML = '<p class="error">请输入搜索关键词</p>';
+                return;
+            }
+
+            resultBox.innerHTML = '<p class="loading">搜索中...</p>';
+
+            try {
+                const response = await fetch(`${API_BASE}/search?q=${encodeURIComponent(keyword)}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    let html = '';
+                    let totalCount = 0;
+
+                    for (const [category, items] of Object.entries(data.data)) {
+                        if (items && items.length > 0) {
+                            html += `<h3 style="color: #569cd6; margin-top: 15px;">${category} (${items.length})</h3>`;
+                            html += '<ul class="resource-list">';
+                            items.forEach(item => {
+                                const name = item.model_name || item.motion_name || item.env_name || item.audio_name;
+                                html += `<li class="resource-item" onclick="selectResource(this, '${name}')">${name}</li>`;
+                            });
+                            html += '</ul>';
+                            totalCount += items.length;
+                        }
+                    }
+
+                    if (totalCount > 0) {
+                        resultBox.innerHTML = `<p class="success">找到 ${totalCount} 个结果</p>` + html;
+                    } else {
+                        resultBox.innerHTML = '<p class="error">未找到任何结果</p>';
+                    }
+                }
+            } catch (error) {
+                resultBox.innerHTML = `<p class="error">搜索失败: ${error.message}</p>`;
+            }
+        }
+
+        // 加载统计信息
+        async function loadStats() {
+            const statsGrid = document.getElementById('statsGrid');
+            statsGrid.innerHTML = '<div class="stat-card loading">加载中...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.data;
+                    let html = '';
+
+                    // 角色数量
+                    html += `
+                        <div class="stat-card">
+                            <div class="stat-value">${stats.characters}</div>
+                            <div class="stat-label">角色</div>
+                        </div>
+                    `;
+
+                    // 环境数量
+                    const envTotal = Object.values(stats.environments || {}).reduce((a, b) => a + b, 0);
+                    html += `
+                        <div class="stat-card">
+                            <div class="stat-value">${envTotal}</div>
+                            <div class="stat-label">环境场景</div>
+                        </div>
+                    `;
+
+                    // 动作数量
+                    const motionTotal = Object.values(stats.motions || {}).reduce((a, b) => a + b, 0);
+                    html += `
+                        <div class="stat-card">
+                            <div class="stat-value">${motionTotal}</div>
+                            <div class="stat-label">动作</div>
+                        </div>
+                    `;
+
+                    // 模型数量
+                    const modelTotal = Object.values(stats.models || {}).reduce((a, b) => a + b, 0);
+                    html += `
+                        <div class="stat-card">
+                            <div class="stat-value">${modelTotal}</div>
+                            <div class="stat-label">模型</div>
+                        </div>
+                    `;
+
+                    statsGrid.innerHTML = html;
+                }
+            } catch (error) {
+                statsGrid.innerHTML = `<div class="stat-card error">加载失败</div>`;
+            }
+        }
+
+        // 选择资源
+        function selectResource(element, resourceName) {
+            // 移除其他选中状态
+            element.parentElement.querySelectorAll('.resource-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // 标记当前选中
+            element.classList.add('selected');
+
+            // 在实际编辑器中，这里会将资源名称填入对应的输入框
+            console.log('选择的资源:', resourceName);
+            alert(`已选择: ${resourceName}\n\n在实际编辑器中，这将自动填入对应的字段。`);
+        }
+
+        // 页面加载完成后初始化
+        window.onload = init;
+    </script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+.command-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: #1e1e1e;
+  overflow: hidden;
+  min-height: 0;
+  height: 100%;
+}
+
+/* 工具栏 */
+.command-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: #252526;
+  border-bottom: 1px solid #3e3e42;
+  flex-shrink: 0;
+}
+
+.search-box {
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #1e1e1e;
+  border: 1px solid #3e3e42;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+  border-color: #007acc;
+}
+
+.search-box input::placeholder {
+  color: #858585;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  background: #1e1e1e;
+  border: 1px solid #3e3e42;
+  border-radius: 4px;
+  color: #d4d4d4;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+
+.filter-select:hover {
+  border-color: #007acc;
+}
+
+.result-count {
+  font-size: 12px;
+  color: #858585;
+  margin-left: auto;
+}
+
+/* 命令容器 */
+.commands-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+  min-height: 0;
+}
+
+/* 命令项 */
+.command-item {
+  background: #252526;
+  border: 1px solid #3e3e42;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.command-item:hover {
+  background: #2d2d30;
+  border-color: #4e4e4e;
+}
+
+.command-item.active {
+  border-color: #007acc;
+  background: rgba(0, 122, 204, 0.1);
+  box-shadow: 0 0 0 1px #007acc;
+}
+
+/* 命令头部 */
+.command-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.btn-edit-cmd {
+  margin-left: auto;
+  padding: 4px 12px;
+  background: #0e639c;
+  border: none;
+  border-radius: 3px;
+  color: #ffffff;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-edit-cmd:hover {
+  background: #1177bb;
+}
+
+.command-index {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  color: #858585;
+  background: #1e1e1e;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.command-type {
+  font-weight: 600;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: lowercase;
+}
+
+/* 命令类型颜色 */
+.command-type.message { background: #1976d2; color: white; }
+.command-type.voice { background: #388e3c; color: white; }
+.command-type.camerasetting { background: #f57c00; color: white; }
+.command-type.actormotion,
+.command-type.actorfacialmotion,
+.command-type.actorfacialoverridemotion { background: #7b1fa2; color: white; }
+.command-type.fade,
+.command-type.transition,
+.command-type.shake { background: #c2185b; color: white; }
+.command-type.bgmplay,
+.command-type.bgmstop { background: #0097a7; color: white; }
+.command-type { background: #616161; color: white; }
+
+.command-time {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 11px;
+  color: #858585;
+  margin-left: auto;
+}
+
+.active-badge {
+  background: #007acc;
+  color: white;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* 命令参数 */
+.command-params {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.param-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  font-size: 12px;
+  align-items: start;
+}
+
+.param-key {
+  color: #858585;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.param-value {
+  color: #d4d4d4;
+  word-break: break-all;
+  font-family: 'Consolas', 'Monaco', monospace;
+  background: #1e1e1e;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+/* Clip信息 */
+.command-clip {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #3e3e42;
+  display: flex;
+  gap: 12px;
+  font-size: 11px;
+  color: #858585;
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.command-clip span {
+  background: #1e1e1e;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+/* 无结果 */
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: #858585;
+}
+
+.no-results-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.3;
+}
+
+.no-results p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* 滚动条 */
+.commands-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.commands-container::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+.commands-container::-webkit-scrollbar-thumb {
+  background: #424242;
+  border-radius: 6px;
+}
+
+.commands-container::-webkit-scrollbar-thumb:hover {
+  background: #4e4e4e;
+}
