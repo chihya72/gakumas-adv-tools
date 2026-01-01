@@ -77,6 +77,18 @@ npm run dev
 > - 批量解析脚本：`cd parser && python batch_parser.py`
 > 
 > 📖 详细教程请查看 [快速开始指南](https://github.com/chihya72/gakumas-adv-tools/wiki/快速开始)
+
+### 🔧 为什么保留 Parser？
+
+虽然 Editor 已经可以直接读取 `.txt` 文件，但 Parser 仍然具有重要价值：
+
+- **🛡️ 技术备份**: 如果 Editor 的时间轴功能开发遇到问题，JSON 格式提供可靠的手动编辑方案
+- **📦 批量处理**: `batch_parser.py` 可一次性解析 2962 个文件，便于数据分析和自动化
+- **🐛 调试工具**: JSON 结构化数据便于检查命令解析是否正确
+- **⚙️ 自动化集成**: 可集成到 CI/CD 流程或其他自动化工具链
+- **✍️ 离线编辑**: JSON 文件可用任何文本编辑器打开，无需启动 Web 服务
+
+> 🎯 定位：Parser 是面向开发者和高级用户的工具，提供 Editor 之外的灵活性和可靠性保障
 ```
 
 详细使用说明请参考 [DATABASE_USAGE.md](./DATABASE_USAGE.md) 和 [DATABASE_QUICKREF.md](./DATABASE_QUICKREF.md)
@@ -124,7 +136,7 @@ Resource Database (资源数据库)
 
 ### 🔧 工具使用
 - [Parser 使用指南](https://github.com/chihya72/gakumas-adv-tools/wiki/Parser使用指南) - 脚本解析器
-- [Editor 使用指南](https://github.com/chihya72/gakumas-adv-tools/wiki/Editor使用指南) - 可视化编辑器
+- [Editor 开发者文档](https://github.com/chihya72/gakumas-adv-tools/wiki/Editor开发者文档) - TypeScript API
 - [Database API](https://github.com/chihya72/gakumas-adv-tools/wiki/Database-API) - 资源数据库接口
 
 ### 💡 实战教程

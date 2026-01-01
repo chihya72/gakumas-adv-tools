@@ -1,14 +1,15 @@
-# 资源API服务器使用指南
+# Database API 参考
+
+资源数据库 API 服务器完整接口文档，为 Web 编辑器提供资源选择和查询功能。
 
 ## 🚀 快速开始
 
 ### 1. 启动服务器
 
 ```bash
-# 使用虚拟环境
-D:/GIT/gakumas-adv-tools/.venv/Scripts/python.exe resource_api_server.py
+cd database
 
-# 或激活虚拟环境后
+# 使用虚拟环境
 python resource_api_server.py
 ```
 
@@ -476,7 +477,7 @@ function ModelSelector({ characterId }) {
 A: 确保API服务器已启动：`python resource_api_server.py`
 
 **Q: 返回数据为空？**  
-A: 确保已导入数据：`python update_resource_database.py --import-list`
+A: 确保已导入数据：`python update_resource_database.py --update`
 
 **Q: 跨域错误？**  
 A: 服务器已启用CORS，检查请求URL是否正确
@@ -486,11 +487,9 @@ A: 编辑 `resource_api_server.py` 中的 `app.run(port=5000)`
 
 ## 📚 相关文档
 
-- [DATABASE_USAGE.md](./DATABASE_USAGE.md) - 数据库详细使用指南
-- [DATABASE_QUICKREF.md](./DATABASE_QUICKREF.md) - 快速参考
-- [resource_selector_demo.html](./resource_selector_demo.html) - 演示页面
+- [快速开始](快速开始) - 5分钟上手指南
+- [Database使用指南](Database使用指南) - 数据库详细说明
 
 ---
 
-**最后更新**: 2025-12-30  
-**API版本**: 1.0
+**最后更新**: 2026年1月2日

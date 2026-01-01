@@ -1,11 +1,11 @@
-# ADV Script 数据模型定义
+# Editor 开发者文档
 
-学園アイドルマスター (Gakumas) Unity ADV 剧情脚本的完整TypeScript类型定义。
+Editor 的 TypeScript 类型定义系统和 API 文档，面向开发者的技术参考。
 
 ## 📁 项目结构
 
 ```
-script-editor/
+editor/
 ├── src/
 │   ├── types/
 │   │   └── adv-script.ts        # 核心类型定义
@@ -13,8 +13,9 @@ script-editor/
 │   │   ├── adv-parser.ts        # 数据解析工具
 │   │   ├── adv-validator.ts     # 命令验证器
 │   │   └── timeline-builder.ts  # 时间轴构建器
+│   ├── components/              # React组件
 │   └── index.ts                 # 主导出文件
-└── README.md
+└── package.json
 ```
 
 ## 🎯 功能特性
@@ -238,6 +239,30 @@ script.commands.forEach(cmd => {
 });
 ```
 
+## 🛠️ 开发
+
+### 启动开发服务器
+
+```bash
+cd editor
+npm install
+npm run dev
+```
+
+访问 http://localhost:5173
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 类型检查
+
+```bash
+npm run type-check
+```
+
 ## 📝 待办事项
 
 - [ ] 添加命令生成器（JSON → ADV脚本）
@@ -246,6 +271,12 @@ script.commands.forEach(cmd => {
 - [ ] 支持脚本差异比较
 - [ ] 添加单元测试
 
-## 📄 许可证
+## 📚 相关文档
 
-本项目用于学習目的，仅供个人研究使用。
+- [快速开始](快速开始) - 5分钟上手指南
+- [Parser使用指南](Parser使用指南) - 脚本解析器
+- [Database API](Database-API) - 资源数据库接口
+
+---
+
+**最后更新**: 2026年1月2日
