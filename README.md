@@ -2,6 +2,18 @@
 
 学園アイドルマスター (Gakumas) ADV脚本工具集 - 解析、编辑、可视化一体化解决方案
 
+[![GitHub Wiki](https://img.shields.io/badge/docs-Wiki-blue)](https://github.com/chihya72/gakumas-adv-tools/wiki)
+[![Data Source](https://img.shields.io/badge/data-Gakumas--Auto--Translate-green)](https://github.com/chihya72/Gakumas-Auto-Translate)
+
+> 📚 **完整文档**: [访问 Wiki](https://github.com/chihya72/gakumas-adv-tools/wiki) 获取详细教程和命令参考
+
+## ✨ 功能特性
+
+- 🔍 **Parser** - 解析 Unity ADV 原始脚本 (2962个文件)
+- ✏️ **Editor** - 可视化 Web 编辑器
+- 🗄️ **Database** - 游戏资源数据库与 API
+- 📊 **Analyzer** - 表情 Index 统计分析 (已验证7个表情)
+
 ## 📁 项目结构
 
 ```
@@ -40,64 +52,31 @@ gakumas-adv-tools/
 
 ## 🚀 快速开始
 
-### 0. 资源数据库与API服务器（新增）
-
-**为Web编辑器提供资源选择的后端数据库**
-
-#### 初始化数据库
-
 ```bash
+# 1. 克隆项目（包含数据 submodule）
+git clone --recursive https://github.com/chihya72/gakumas-adv-tools.git
+cd gakumas-adv-tools
+
+# 2. 安装 Python 依赖
+pip install -r requirements.txt
+
+# 3. 启动资源数据库 API（为编辑器提供资源选择功能）
 cd database
-
-# 1. 初始化数据库表结构
-python update_resource_database.py --init
-
-# 2. 设置游戏解包目录（只需设置一次）
-python update_resource_database.py --set-game-dir "D:\GIT\Gakuen-idolmaster-ab-decrypt\output"
-
-# 3. 导入资源（自动从配置的目录扫描）
-python update_resource_database.py --update
-
-# 4. 查看数据库统计
-python update_resource_database.py --stats
-```
-
-#### 启动API服务器
-
-```bash
-cd database
-
-# 启动资源API服务器（为Web编辑器提供资源选择接口）
 python resource_api_server.py
+# 访问 http://localhost:5000
+
+# 4. 启动 Web 编辑器（新终端）
+cd editor
+npm install
+npm run dev
+# 访问 http://localhost:5173
 ```
 
-**API服务器运行在 `http://localhost:5000`**
-
-#### 测试资源选择器
-
-在浏览器中打开 [database/resource_selector_demo.html](./database/resource_selector_demo.html) 查看演示。
-
-**可用API接口：**
-- `GET /api/resources/models` - 获取模型列表（body/face/hair）
-- `GET /api/resources/motions` - 获取动作列表（actormotion/facial）
-- `GET /api/resources/environments` - 获取场景列表（2D/3D backgrounds）
-- `GET /api/resources/audio` - 获取音频列表（voice/bgm/se）
-- `GET /api/characters` - 获取所有角色
-- `GET /api/search?q=关键词` - 搜索资源
-cd database
-
-# 查询角色amao的所有动作
-python resource_crud.py --query-motion --character amao
-
-# 搜索包含"night"的场景
-python resource_crud.py --search night
-
-# 查询所有2D场景
-python resource_crud.py --query-env --type 2d
-```
-
-详细使用说明请参考 [database/README.md](./database/README
-python resource_crud.py --query-env --type 2d
+> 💡 **进阶功能**：
+> - 分析表情索引：`python analyze_facial_indices.py`
+> - 批量解析脚本：`cd parser && python batch_parser.py`
+> 
+> 📖 详细教程请查看 [快速开始指南](https://github.com/chihya72/gakumas-adv-tools/wiki/快速开始)
 ```
 
 详细使用说明请参考 [DATABASE_USAGE.md](./DATABASE_USAGE.md) 和 [DATABASE_QUICKREF.md](./DATABASE_QUICKREF.md)
@@ -131,97 +110,26 @@ Resource Database (资源数据库)
 - `audio_files`: 语音、BGM、音效
 - `file_mappings`: 资源名 → 实际文件路径映射
 
-### 
-### 2. 加载并编辑脚本
+## 📖 文档
 
-**🎉 现在支持直接加载TXT文件！**
+完整文档已迁移到 Wiki：
 
-1. 在Web编辑器中点击"📁 加载脚本"
-2. 选择 `gakumas-data/data/` 目录下的任意 `.txt` 文件（**无需预先转换**）
-3. 或者选择 `output/` 目录下的 `.json` 文件
-4. 使用时间轴编辑器查看和编辑脚本
+### 📚 入门指南
+- [快速开始](https://github.com/chihya72/gakumas-adv-tools/wiki/快速开始) - 5分钟上手
+- [项目架构](https://github.com/chihya72/gakumas-adv-tools/wiki/项目架构) - 理解代码结构
 
-**支持的文件格式：**
-- `.txt` - Unity ADV原始脚本文件（**推荐**，直接加载）
-- `.json` - 解析后的JSON文件（兼容旧格式）
+### 📖 命令参考
+- [actorfacialoverridemotion](https://github.com/chihya72/gakumas-adv-tools/wiki/actorfacialoverridemotion) - 面部表情覆盖
+- [表情 Index 参考表](https://github.com/chihya72/gakumas-adv-tools/wiki/表情-Index-参考表) - 已验证7个表情
 
-### 3. (可选) 使用Python解析器批量转换
+### 🔧 工具使用
+- [Parser 使用指南](https://github.com/chihya72/gakumas-adv-tools/wiki/Parser使用指南) - 脚本解析器
+- [Editor 使用指南](https://github.com/chihya72/gakumas-adv-tools/wiki/Editor使用指南) - 可视化编辑器
+- [Database API](https://github.com/chihya72/gakumas-adv-tools/wiki/Database-API) - 资源数据库接口
 
-如果需要批量转换TXT到JSON：
-
-```bash
-cd parser
-
-# 单文件解析
-python parser.py <输入文件.txt>
-
-# 批量解析 (解析所有ADV脚本)
-python batch_parser.py
-```
-
-解析后的JSON文件会保存到 `output/` 目录。
-
-## 📦 功能特性
-
-### Parser (Python解析器)
-
-- ✅ 支持25+种Unity ADV命令类型
-- ✅ 处理嵌套JSON结构 (brackets, arrays)
-- ✅ 正确解析转义字符 (`\{`, `\}`, `\"`)
-- ✅ 多线程批量处理 (8并发)
-- ✅ 进度条显示 (tqdm)
-- ✅ 错误处理和日志记录
-
-**解析格式示例：**
-```
-[message clip=\{...\}] 文本内容
-[voiDatabase
-- **SQLite3** - 轻量级关系数据库
-- **Python 3.12+** - 数据库操作脚本
-
-### ce name=vo_123 clip=\{...\}]
-[camerasetting setting=\{...\}]
-```
-
-### Editor (Web编辑器)
-
-- 🎬 **5轨道时间轴**：对话、语音、镜头、角色、特效
-- 💬 **对话预览**：实时显示with Ruby注音
-### ADV脚本编辑流程
-```mermaid
-graph LR
-    A[原始ADV脚本<br>.txt] --> B[Parser解析]
-    B --> C[JSON数据<br>output/]
-    C --> D[Editor加载]
-    D --> E[时间轴可视化]
-    D --> F[命令列表]
-    D --> G[对话预览]
-```
-
-### 资源数据库流程
-```mermaid
-graph LR
-    A[列表.txt<br>资源名称] --> B[update_resource_database.py<br>导入分类]
-    B --> C[SQLite数据库<br>character_resources.db]
-    D[游戏解包文件<br>D:\GIT\Gakuen-idolmaster-ab-decrypt\output] --> E[scan_game_files<br>建立文件映射]
-    E --> C
-    C --> F[resource_crud.py<br>查询/增删改]
-    F --> G[资源管理<br>场景/动作/模型/音频
-### Parser
-- **Python 3.12+**
-- **tqdm** - 进度条显示
-
-### Editor
-- **React 18** - UI框架
-- **TypeScript 5.3** - 类型系统
-- **Vite 5** - 构建工具
-- **CSS3** - 样式系统
-
-## 📖 使用流程
-
-```mermaid
-graph LR
-    A[原始ADV脚本<br>.txt] --> B[Parser解析]
+### 💡 实战教程
+- [表情编辑实战](https://github.com/chihya72/gakumas-adv-tools/wiki/表情编辑实战) - 修改角色表情
+- [时间轴编辑技巧](https://github.com/chihya72/gakumas-adv-tools/wiki/时间轴编辑技巧) - 时间轴系统
     B --> C[JSON数据<br>output/]
     C --> D[Editor加载]
     D --> E[时间轴可视化]
@@ -292,115 +200,30 @@ python resource_crud.py --delete-motion 123
 
 ### 特殊控制
 - `wait` - 等待
-- `waitvoice` - 等待语音结束
-- `autoflag` - 自动播放标记
+## 🛠️ 技术栈
 
-...等共25+种命令类型
+- **Python 3.8+** - Parser 和数据库工具
+- **TypeScript & React** - Web 编辑器
+- **SQLite3** - 资源数据库
+- **Vite** - 构建工具
 
-## 🗂️ 输出目录说明
+## 📦 数据源
 
-`output/` 目录包含2890+个解析后的JSON文件，命名格式：
-- 原始文件：`adv_cidol-amao-3-000_01.txt`
-- 解析输出：`adv_cidol-amao-3-000_01.json`
+本项目使用 Git Submodule 链接到 [Gakumas-Auto-Translate](https://github.com/chihya72/Gakumas-Auto-Translate)，包含 **2962 个 ADV 脚本文件**。
 
-每个JSON文件包含：
-```json
-{
-  "sourceFile": "原始文件路径",
-  "totalCommands": 124,
-  "duration": 104.33,
-  "commands": [
-    {
-      "type": "message",
-      "params": {...},
-### ADV脚本流程
-1. **原始脚本** (`d:\Games\gakumas\resource\adv\`) 
-   ↓
-2. **Parser解析** (`parser/parser.py`)
-   ↓
-3. **JSON输出** (`output/*.json`)
-   ↓
-4. **Editor加载** (Web界面)
-   ↓
-5. **可视化编辑** (时间轴/命令列表/预览)
-
-### 资源数据库流程
-1. **游戏解包** (`D:\GIT\Gakuen-idolmaster-ab-decrypt\output`)
-   ↓
-2. **资源列表** (`列表.txt` - 筛选后的资源名)
-   ↓
-3. **数据库导入** (`update_resource_database.py --import-list`)
-   ↓
-4. **文件映射** (`--scan-files` 建立名称→路径关联)
-   ↓
-5. **CRUD操作** (`resource_crud.py` 查询/管理资源
 ```bash
-cd parser
-
-# 单文件测试
-python parser.py test.txt
-
-# 批量处理
-python batch_parser.py
-
-# 调试模式 (带详细日志)
-python parser.py test.txt --debug
+# 更新数据源
+cd gakumas-data
+git pull origin master
 ```
 
-### Editor
-```bash
-cd editor
+## 🤝 贡献
 
-# 开发模式 (热更新)
-npm run dev
-
-- [资源数据库使用指南](./DATABASE_USAGE.md) ⭐新增
-- [资源数据库更新工具](./update_resource_database.py)
-- [资源CRUD操作工具](./resource_crud.py)
-
----
-
-**最后更新**: 2025-12-30  
-**总解析文件数**: 2890  
-**支持命令类型**: 25+  
-**数据库资源分类**: 2D场景/3D场景/动作/模型/音频
-# 预览生产构建
-npm run preview
-```
-
-## 📂 数据流
-
-1. **原始脚本** (`d:\Games\gakumas\resource\adv\`) 
-   ↓
-2. **Parser解析** (`parser/parser.py`)
-   ↓
-3. **JSON输出** (`output/*.json`)
-   ↓
-4. **Editor加载** (Web界面)
-   ↓
-5. **可视化编辑** (时间轴/命令列表/预览)
-
-## ⚠️ 注意事项
-
-1. **文件编码**：所有脚本文件使用UTF-8编码
-2. **JSON转义**：`\{` `\}` 会被解析为 `{` `}`，`\"` 保留
-3. **时间单位**：所有时间以秒为单位 (ClipData.startTime)
-4. **并发数**：batch_parser默认8线程，可根据CPU调整
-5. **浏览器兼容**：推荐Chrome/Edge 90+, Firefox 88+
-
-## 🐛 常见问题
-
-**Q: Parser报错 "找不到文件"**  
-A: 检查 `batch_parser.py` 中的 `INPUT_DIR` 路径配置
-
-**Q: Editor加载JSON后显示空白**  
-A: 检查JSON文件格式，确保包含 `commands` 数组
-
-**Q: 时间轴显示异常**  
-A: 确认 ClipData 包含 `startTime` 和 `duration` 字段
-
-**Q: Ruby注音不显示**  
-A: 检查 message 内容中的 `<r\=...>` 标签格式
+欢迎贡献！特别是：
+- 🔬 测试并验证新的表情 Index
+- 📝 改进文档和教程
+- 🐛 报告 Bug 和建议功能
+- 🌐 添加更多命令的解析支持
 
 ## 📄 许可证
 
@@ -408,21 +231,11 @@ MIT License
 
 ## 🔗 相关链接
 
-### 核心文档
-- [Unity ADV Script格式文档](./parser/FORMAT.md) (待创建)
-- [TypeScript类型定义](./editor/src/types/adv-script.ts)
-- [解析器实现细节](./parser/parser.py)
-
-### 数据库相关 ⭐新增
-- **� [数据库系统目录](./database/)** - 完整的资源数据库系统
-
-- **🔌 [API接口文档](./database/API_REFERENCE.md)** - API服务器文档
-- [资源选择器演示](./database/resource_selector_demo.html) - 前端集成示例
+- [GitHub Wiki](https://github.com/chihya72/gakumas-adv-tools/wiki) - 完整文档
+- [数据源项目](https://github.com/chihya72/Gakumas-Auto-Translate) - ADV 脚本数据
+- [问题反馈](https://github.com/chihya72/gakumas-adv-tools/issues) - Bug 报告和功能建议
 
 ---
 
-**最后更新**: 2025-12-30  
-**总解析文件数**: 2890  
-**支持命令类型**: 25+  
-**数据库资源**: 环境场景353 | 动作1011 | 模型812 | 音频5  
-**API服务器**: ✅ http://localhost:5000
+**最后更新**: 2026年1月2日  
+**数据统计**: 2962个ADV文件 | 46个表情Index (7个已验证) | 25+种命令类型
