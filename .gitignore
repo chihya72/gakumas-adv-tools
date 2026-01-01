@@ -31,6 +31,9 @@ resource/
 facial_index_analysis.txt
 *.log
 
+# Wiki repository (managed separately)
+wiki-repo/
+
 # Temporary files
 *.tmp
 *.bak
