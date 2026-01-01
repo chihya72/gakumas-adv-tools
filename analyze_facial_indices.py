@@ -135,8 +135,8 @@ def infer_index_meaning(idx: int, count: int, durations: List[float], values: Li
         return "持续表情"
 
 def main():
-    # 分析D:\GIT\gakumas-adv-tools\resource目录
-    resource_dir = r"D:\GIT\gakumas-adv-tools\resource"
+    # 分析 gakumas-data/data 目录（从 Gakumas-Auto-Translate submodule）
+    resource_dir = r"gakumas-data/data"
     
     print("="*80)
     print("面部动画Index使用频率统计分析")
