@@ -394,8 +394,8 @@ class ADVScriptParser:
 
 def main():
     """测试解析器"""
-    # 解析当前文件
-    current_file = Path(r"d:\Games\gakumas\gakumas-local\local-files\resource\adv_cidol-amao-3-000_01.txt")
+    # 解析示例文件 - 使用 submodule 数据源
+    current_file = Path(__file__).parent.parent / "gakumas-data" / "data" / "adv_cidol-amao-3-000_01.txt"
     
     parser = ADVScriptParser()
     commands = parser.parse_file(current_file)

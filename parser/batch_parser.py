@@ -156,8 +156,8 @@ class BatchParser:
 
 
 def main():
-    # 配置路径
-    resource_dir = Path(r"d:\Games\gakumas\gakumas-local\local-files\resource")
+    # 配置路径 - 使用 submodule 数据源
+    resource_dir = Path(__file__).parent.parent / "gakumas-data" / "data"
     output_dir = Path(__file__).parent.parent / "output"
     
     # 创建批量解析器

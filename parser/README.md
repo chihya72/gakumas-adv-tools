@@ -34,7 +34,7 @@ python batch_parser.py
 ```
 
 这会：
-- 解析 `resource` 目录下的所有 `.txt` 文件
+- 解析 `gakumas-data/data` 目录下的所有 `.txt` 文件（来自 Git Submodule）
 - 使用多线程并行处理（默认8线程）
 - 输出JSON文件到 `parsed-scripts` 目录
 - 生成详细的解析报告
