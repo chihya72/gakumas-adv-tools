@@ -1,0 +1,3 @@
+[submodule "gakumas-data"]
+	path = gakumas-data
+	url = https://github.com/chihya72/Gakumas-Auto-Translate.git
