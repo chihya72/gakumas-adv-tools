@@ -1,0 +1,133 @@
+.card {
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-left: 4px solid #ccc;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-selected {
+  border-left-color: #2196f3;
+  background: #e3f2fd;
+}
+
+.card-highlighted {
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(33, 150, 243, 0.5);
+  }
+}
+
+/* 不同类型的卡片颜色 */
+.card-message {
+  border-left-color: #4caf50;
+}
+
+.card-actor {
+  border-left-color: #ff9800;
+}
+
+.card-background {
+  border-left-color: #9c27b0;
+}
+
+.card-camera {
+  border-left-color: #2196f3;
+}
+
+.card-audio {
+  border-left-color: #e91e63;
+}
+
+.card-effect {
+  border-left-color: #00bcd4;
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: #666;
+}
+
+.card-icon {
+  font-size: 16px;
+}
+
+.card-type {
+  flex: 1;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.card-time {
+  background: #2196f3;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.card-position {
+  background: #9e9e9e;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+/* 卡片标题 */
+.card-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 0;
+  color: #333;
+  line-height: 1.4;
+}
+
+/* 操作按钮 */
+.card-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.card-action-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.card-action-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.card-action-btn:active {
+  background: rgba(0, 0, 0, 0.1);
+}
