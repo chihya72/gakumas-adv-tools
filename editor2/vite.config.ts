@@ -5,8 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3001,
-    host: '0.0.0.0', // 允许局域网访问
+    port: 5173,
     allowedHosts: ['txt.gakumas.cn'], // 允许的域名
   },
 })
