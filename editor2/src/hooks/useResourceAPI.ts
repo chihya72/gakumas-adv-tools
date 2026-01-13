@@ -102,6 +102,16 @@ export interface Environment {
 }
 
 /**
+ * Audio资源类型
+ */
+export interface Audio {
+  id: number;
+  audio_name: string;
+  audio_type: 'voice' | 'bgm' | 'se';
+  character_id?: string | null;
+}
+
+/**
  * 获取动作或表情资源
  */
 export function useMotions(motionType: 'character' | 'facial') {
@@ -132,4 +142,20 @@ export function useModels(characterId: string, modelType: 'body' | 'face' | 'hai
  */
 export function useCharacters() {
   return useResourceAPI<string>('/api/characters');
+}
+
+/**
+ * 获取语音资源
+ * @param characterId 角色ID（可选）
+ * @param audioType 音频类型（可选：'voice' | 'bgm' | 'se'）
+ */
+export function useVoices(characterId?: string, audioType: 'voice' | 'bgm' | 'se' = 'voice') {
+  const params = new URLSearchParams({ audio_type: audioType });
+  if (characterId) {
+    params.append('character_id', characterId);
+  }
+  return useResourceAPI<Audio>(
+    `/api/resources/audio?${params.toString()}`,
+    { autoLoad: true }
+  );
 }

@@ -1,6 +1,6 @@
 /**
- * 通用角色资源编辑器
- * 统一 actormotion 和 actorfacialmotion 的实现
+ * Voice 命令编辑器
+ * 用于播放角色语音
  */
 
 import React from 'react';
@@ -8,37 +8,27 @@ import { CommandCard } from '../../../types/command-card';
 import { FormField } from '../../../types/edit-form';
 import { LoadingState, ErrorState, EmptyState } from '../../common';
 import { useAvailableActorIds } from '../../../hooks/useAvailableIds';
-import { useMotions } from '../../../hooks/useResourceAPI';
+import { useVoices, Audio } from '../../../hooks/useResourceAPI';
 import '../../FormEditor/FormEditor.css';
 
-interface ActorResourceEditorConfig {
-  resourceType: 'character' | 'facial';
-  resourceLabel: string;
-  additionalFields?: FormField[];
-}
-
-interface ActorResourceEditorProps {
+interface VoiceEditorProps {
   card: CommandCard;
   onChange: (updatedCard: CommandCard, isValid?: boolean) => void;
-  config: ActorResourceEditorConfig;
 }
 
 /**
- * 通用角色资源编辑器
- * 用于 actormotion 和 actorfacialmotion
+ * Voice 命令编辑器
+ * 格式: [voice voice=语音文件名 actorId=角色ID channel=1]
  */
-export const ActorResourceEditor: React.FC<ActorResourceEditorProps> = ({ 
-  card, 
-  onChange, 
-  config 
-}) => {
+export const VoiceEditor: React.FC<VoiceEditorProps> = ({ card, onChange }) => {
   const availableActorIds = useAvailableActorIds();
-  const { data: motions, loading, error, reload } = useMotions(config.resourceType);
+  const currentActorId = card.params.actorId || (availableActorIds.length > 0 ? availableActorIds[0] : '');
+  const { data: voices, loading, error, reload } = useVoices(currentActorId);
 
   const handleChange = (key: string, value: any) => {
     const newParams = { ...card.params, [key]: value };
-    const isValid = !!(newParams.id && newParams.id.trim() !== '' && 
-                       newParams.motion && newParams.motion.trim() !== '');
+    const isValid = !!(newParams.actorId && newParams.actorId.trim() !== '' && 
+                       newParams.voice && newParams.voice.trim() !== '');
     
     onChange({
       ...card,
@@ -48,12 +38,12 @@ export const ActorResourceEditor: React.FC<ActorResourceEditorProps> = ({
 
   // 加载状态
   if (loading) {
-    return <LoadingState message={`加载${config.resourceLabel}列表中...`} />;
+    return <LoadingState message="加载语音列表中..." />;
   }
 
   // 错误状态
   if (error) {
-    return <ErrorState message={`加载${config.resourceLabel}列表失败`} details={error} onRetry={reload} />;
+    return <ErrorState message="加载语音列表失败" details={error} onRetry={reload} />;
   }
 
   // 无可用角色
@@ -70,29 +60,36 @@ export const ActorResourceEditor: React.FC<ActorResourceEditorProps> = ({
   // 构建字段列表
   const fields: FormField[] = [
     {
-      key: 'id',
+      key: 'actorId',
       label: '角色ID',
       type: 'select',
-      value: card.params.id || '',
+      value: card.params.actorId || '',
       options: availableActorIds.map(id => ({ label: id, value: id })),
       required: true,
       helpText: '只能选择在 actorgroup 中已定义的角色',
     },
     {
-      key: 'motion',
-      label: config.resourceLabel,
-      type: 'select',
-      value: card.params.motion || '',
-      options: motions.map(m => {
-        let label = m.motion_name;
-        if (m.character_id) label += ` (${m.character_id})`;
-        if (m.action_type) label += ` - ${m.action_type}`;
-        return { label, value: m.motion_name };
-      }),
+      key: 'voice',
+      label: '语音文件名',
+      type: voices.length > 0 ? 'select' : 'text',
+      value: card.params.voice || '',
+      options: voices.map((v: Audio) => ({
+        label: v.audio_name,
+        value: v.audio_name
+      })),
       required: true,
-      helpText: '从数据库中选择资源',
+      helpText: voices.length > 0 
+        ? '从数据库中选择语音文件'
+        : '请手动输入语音文件名（数据库无此角色的语音记录）',
     },
-    ...(config.additionalFields || []),
+    {
+      key: 'channel',
+      label: '音频通道',
+      type: 'number',
+      value: card.params.channel ?? 1,
+      required: false,
+      helpText: '音频播放通道（默认为1）',
+    },
   ];
 
   // 直接渲染字段，不使用折叠的 section
@@ -120,15 +117,20 @@ export const ActorResourceEditor: React.FC<ActorResourceEditorProps> = ({
               ))}
             </select>
           )}
+          {type === 'text' && (
+            <input
+              type="text"
+              value={value || ''}
+              onChange={(e) => handleChange(key, e.target.value)}
+              className="form-input"
+            />
+          )}
           {type === 'number' && (
             <input
               type="number"
               value={value ?? ''}
               onChange={(e) => handleChange(key, parseFloat(e.target.value))}
               className="form-input"
-              step={field.step}
-              min={field.min}
-              max={field.max}
             />
           )}
         </div>

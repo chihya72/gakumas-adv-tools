@@ -9,9 +9,11 @@ import { DialogueEditor } from './DialogueEditor/DialogueEditor';
 import { CameraSettingEditor } from './CameraSettingEditor/CameraSettingEditor';
 import { ActorMotionEditor } from './ActorMotionEditor/ActorMotionEditor';
 import { ActorFacialMotionEditor } from './ActorFacialMotionEditor/ActorFacialMotionEditor';
+import { ActorFacialOverrideMotionEditor } from './ActorFacialOverrideMotionEditor/ActorFacialOverrideMotionEditor';
 import { BackgroundSettingEditor } from './BackgroundSettingEditor/BackgroundSettingEditor';
 import { FadeEditor } from './FadeEditor/FadeEditor';
 import { TransitionEditor } from './TransitionEditor/TransitionEditor';
+import { VoiceEditor } from './VoiceEditor/VoiceEditor';
 import { GenericEditor } from './GenericEditor/GenericEditor';
 
 export interface CommandEditorProps {
@@ -30,8 +32,10 @@ const editorMap: Record<string, EditorComponent> = {
   'backgroundsetting': BackgroundSettingEditor,
   'actormotion': ActorMotionEditor,
   'actorfacialmotion': ActorFacialMotionEditor,
+  'actorfacialoverridemotion': ActorFacialOverrideMotionEditor,
   'fade': FadeEditor,
   'transition': TransitionEditor,
+  'voice': VoiceEditor,
   // 可以继续添加更多特殊编辑器
 };
 
@@ -59,7 +63,9 @@ export {
   BackgroundSettingEditor,
   ActorMotionEditor,
   ActorFacialMotionEditor,
+  ActorFacialOverrideMotionEditor,
   FadeEditor,
   TransitionEditor,
+  VoiceEditor,
   GenericEditor,
 };
