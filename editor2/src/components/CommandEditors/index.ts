@@ -8,6 +8,10 @@ import { CommandCard } from '../../types/command-card';
 import { DialogueEditor } from './DialogueEditor/DialogueEditor';
 import { CameraSettingEditor } from './CameraSettingEditor/CameraSettingEditor';
 import { ActorMotionEditor } from './ActorMotionEditor/ActorMotionEditor';
+import { ActorFacialMotionEditor } from './ActorFacialMotionEditor/ActorFacialMotionEditor';
+import { BackgroundSettingEditor } from './BackgroundSettingEditor/BackgroundSettingEditor';
+import { FadeEditor } from './FadeEditor/FadeEditor';
+import { TransitionEditor } from './TransitionEditor/TransitionEditor';
 import { GenericEditor } from './GenericEditor/GenericEditor';
 
 export interface CommandEditorProps {
@@ -23,8 +27,11 @@ const editorMap: Record<string, EditorComponent> = {
   'narration': DialogueEditor,
   'dialogue': DialogueEditor,
   'camerasetting': CameraSettingEditor,
+  'backgroundsetting': BackgroundSettingEditor,
   'actormotion': ActorMotionEditor,
-  'actorfacialmotion': ActorMotionEditor, // 复用动作编辑器
+  'actorfacialmotion': ActorFacialMotionEditor,
+  'fade': FadeEditor,
+  'transition': TransitionEditor,
   // 可以继续添加更多特殊编辑器
 };
 
@@ -49,6 +56,10 @@ export function hasSpecialEditor(commandType: string): boolean {
 export {
   DialogueEditor,
   CameraSettingEditor,
+  BackgroundSettingEditor,
   ActorMotionEditor,
+  ActorFacialMotionEditor,
+  FadeEditor,
+  TransitionEditor,
   GenericEditor,
 };

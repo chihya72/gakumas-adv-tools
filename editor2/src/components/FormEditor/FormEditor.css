@@ -4,14 +4,10 @@
 
 .form-section {
   margin-bottom: 16px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  overflow: hidden;
 }
 
 .form-section-header {
-  padding: 12px 16px;
-  background: #f5f5f5;
+  padding: 12px 0;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
@@ -21,7 +17,7 @@
 }
 
 .form-section-header:hover {
-  background: #e8e8e8;
+  /* 保留以便未来添加样式 */
 }
 
 .form-section-header h4 {
@@ -42,8 +38,7 @@
 }
 
 .form-section-content {
-  padding: 16px;
-  background: #ffffff;
+  padding: 0;
 }
 
 .form-field {

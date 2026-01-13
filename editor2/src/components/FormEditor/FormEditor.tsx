@@ -26,7 +26,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({ sections, onChange }) =>
   };
 
   const renderField = (field: FormField) => {
-    const { key, label, type, value, required, placeholder, min, max, step, options, helpText } = field;
+    const { key, label, type, value, required, placeholder, min, max, step, options, helpText, disabled, hint } = field;
 
     const handleChange = (newValue: any) => {
       onChange(key, newValue);
@@ -47,6 +47,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({ sections, onChange }) =>
               onChange={(e) => handleChange(e.target.value)}
               placeholder={placeholder}
               className="form-input"
+              disabled={disabled}
             />
           )}
 
@@ -78,6 +79,8 @@ export const FormEditor: React.FC<FormEditorProps> = ({ sections, onChange }) =>
               value={value ?? ''}
               onChange={(e) => handleChange(e.target.value)}
               className="form-select"
+              disabled={disabled}
+              style={disabled ? { backgroundColor: '#f0f0f0', cursor: 'not-allowed', color: '#999' } : {}}
             >
               {options?.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -198,6 +201,7 @@ export const FormEditor: React.FC<FormEditorProps> = ({ sections, onChange }) =>
         </div>
 
         {helpText && <div className="form-field-help">{helpText}</div>}
+        {hint && <small className="field-hint" style={{ display: 'block', marginTop: '4px', color: disabled ? '#999' : '#666' }}>{hint}</small>}
       </div>
     );
   };

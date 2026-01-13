@@ -205,10 +205,12 @@ export function parseBackgroundLayoutGroup(params: Record<string, any>): Backgro
     
     return layoutSegments
       .map(segment => {
-        const idMatch = segment.match(/id=(\w+)/);
+        // 匹配 id= 后面的值（包括空值）
+        const idMatch = segment.match(/id=([\w]*)/);
         if (!idMatch) return null;
         
-        return { id: idMatch[1] };
+        // 即使 id 为空也返回，避免卡片消失
+        return { id: idMatch[1] || '(未设置)' };
       })
       .filter((layout): layout is BackgroundLayout => layout !== null);
   } catch (e) {

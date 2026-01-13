@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CommandCard, createCardFromCommand } from '../../types/command-card';
+import { CommandCard, createCardFromCommand, generateCardTitle } from '../../types/command-card';
 import { CardList } from '../CardList';
 import { getRenderer } from './renderers';
 import { parseAdvScript } from './parser';
@@ -8,10 +8,11 @@ import { EditDialog } from '../EditDialog';
 import { getCommandEditor } from '../CommandEditors';
 import { ClipEditor } from '../CommandEditors/ClipEditor/ClipEditor';
 import { RawCommandEditor } from '../CommandEditors/RawCommandEditor/RawCommandEditor';
-import { parseBackgroundGroup, parseActorGroup, parseActorLayoutGroup } from './renderers/parserHelpers';
+import { parseBackgroundGroup, parseActorGroup, parseActorLayoutGroup, parseBackgroundLayoutGroup } from './renderers/parserHelpers';
 import BackgroundItemEditor from '../CommandEditors/BackgroundItemEditor/BackgroundItemEditor';
 import ActorItemEditor from '../CommandEditors/ActorItemEditor/ActorItemEditor';
 import ActorLayoutItemEditor from '../CommandEditors/ActorLayoutItemEditor/ActorLayoutItemEditor';
+import { BackgroundLayoutGroupItemEditor } from '../GroupEditors/BackgroundLayoutGroupItemEditor';
 import '../App.css';
 
 export const App: React.FC = () => {
@@ -28,6 +29,16 @@ export const App: React.FC = () => {
   // 背景项编辑状态
   const [editingItemIndex, setEditingItemIndex] = useState<number>(-1);
   const [editingItemData, setEditingItemData] = useState<Record<string, any>>({});
+  const [canSaveGroupItem, setCanSaveGroupItem] = useState<boolean>(true); // Group项验证状态
+  const [canSaveEdit, setCanSaveEdit] = useState<boolean>(true); // 通用编辑验证状态
+
+  // 将cards暴露给编辑器使用（通过window对象）
+  useEffect(() => {
+    (window as any).__editorCards = cards;
+    return () => {
+      delete (window as any).__editorCards;
+    };
+  }, [cards]);
 
   // 控制 body 滚动（竖屏模式）
   useEffect(() => {
@@ -120,6 +131,7 @@ export const App: React.FC = () => {
     setEditingCard(card);
     setEditedCard({ ...card }); // 创建副本用于编辑
     setEditMode(mode);
+    setCanSaveEdit(true); // 重置验证状态
   };
   
   // 通用：编辑 Group 中的单个项
@@ -156,6 +168,16 @@ export const App: React.FC = () => {
           transform: layout.transform || {}
         });
       }
+    } else if (itemType === 'backgroundlayout') {
+      const layouts = parseBackgroundLayoutGroup(card.params);
+      if (itemIndex >= 0 && itemIndex < layouts.length) {
+        const layout = layouts[itemIndex];
+        setEditingCard(card);
+        setEditingItemIndex(itemIndex);
+        setEditingItemData({ 
+          id: layout.id || ''
+        });
+      }
     }
     // 未来可以扩展其他类型
   };
@@ -180,6 +202,7 @@ export const App: React.FC = () => {
         }
       });
     }
+    // backgroundlayout 不支持添加，只能编辑已有项
     // 未来可以扩展其他类型
   };
   
@@ -194,6 +217,8 @@ export const App: React.FC = () => {
       saveActorGroupItem();
     } else if (editingCard.type === 'actorlayoutgroup') {
       saveActorLayoutGroupItem();
+    } else if (editingCard.type === 'backgroundlayoutgroup') {
+      saveBackgroundLayoutGroupItem();
     }
     // 未来可以添加其他类型的处理
   };
@@ -563,9 +588,124 @@ export const App: React.FC = () => {
     return rawLine;
   };
 
+  // 背景布局组项保存逻辑
+  const saveBackgroundLayoutGroupItem = () => {
+    if (!editingCard) return;
+    
+    // 验证：id 不能为空
+    if (!editingItemData.id || editingItemData.id.trim() === '') {
+      alert('背景ID不能为空！');
+      return;
+    }
+    
+    const layouts = parseBackgroundLayoutGroup(editingCard.params);
+    
+    // 添加模式（index = -2）
+    if (editingItemIndex === -2) {
+      layouts.push({
+        id: editingItemData.id.trim(),
+      });
+    }
+    // 编辑模式
+    else if (editingItemIndex >= 0 && editingItemIndex < layouts.length) {
+      layouts[editingItemIndex] = {
+        id: editingItemData.id.trim(),
+      };
+    } else {
+      return;
+    }
+    
+    // 重新生成 layouts 参数字符串 - 每个布局使用 [backgroundlayout ...] 格式
+    const layoutStrs = layouts.map((layout: any) => {
+      return `[backgroundlayout id=${layout.id}]`;
+    });
+    
+    // 重新生成卡片标题
+    const layoutIds = layouts
+      .map((layout: any) => layout.id)
+      .filter((id: string) => id);
+    const newTitle = layoutIds.length > 0 
+      ? `3D背景布局: ${layoutIds.join(', ')}` 
+      : '3D背景布局: 未知';
+    
+    // 更新 params.layouts 字符串
+    const newLayoutsParam = layouts
+      .map((layout: any) => `id=${layout.id}`)
+      .join(' ||| ');
+    
+    // 更新卡片
+    const updatedCard: CommandCard = {
+      ...editingCard,
+      title: newTitle,
+      params: {
+        ...editingCard.params,
+        layouts: newLayoutsParam,
+      },
+      isModified: true,
+      raw_line: updateBackgroundLayoutGroupText(editingCard, layoutStrs),
+    };
+    
+    setCards(prev => 
+      prev.map(c => c.id === updatedCard.id ? updatedCard : c)
+    );
+    
+    if (selectedCard?.id === updatedCard.id) {
+      setSelectedCard(updatedCard);
+    }
+    
+    // 清理状态
+    setEditingCard(null);
+    setEditingItemIndex(-1);
+    setEditingItemData({});
+  };
+
+  // 更新 backgroundlayoutgroup 命令文本
+  const updateBackgroundLayoutGroupText = (card: CommandCard, layoutStrs: string[]): string => {
+    let rawLine = card.raw_line || '';
+    if (!rawLine || layoutStrs.length === 0) return rawLine;
+    
+    // backgroundlayoutgroup 命令的格式是：[backgroundlayoutgroup layouts=[backgroundlayout id=...] layouts=[backgroundlayout id=...] clip={...}]
+    // 我们需要替换所有的 layouts 参数，但保留 clip 参数
+    
+    // 先找到 backgroundlayoutgroup 命令的开始和结束
+    const startIdx = rawLine.indexOf('[backgroundlayoutgroup');
+    if (startIdx === -1) return rawLine;
+    
+    // 找到对应的结束括号
+    let bracketCount = 0;
+    let endIdx = startIdx;
+    for (let i = startIdx; i < rawLine.length; i++) {
+      if (rawLine[i] === '[') bracketCount++;
+      if (rawLine[i] === ']') {
+        bracketCount--;
+        if (bracketCount === 0) {
+          endIdx = i;
+          break;
+        }
+      }
+    }
+    
+    // 提取原始命令内容
+    const originalCommand = rawLine.substring(startIdx, endIdx + 1);
+    
+    // 提取 clip 参数（如果存在）
+    const clipMatch = originalCommand.match(/clip=\\?\{[^}]+\\?\}/);
+    const clipParam = clipMatch ? ` ${clipMatch[0]}` : '';
+    
+    // 重新构建命令
+    const newLayoutParams = layoutStrs.map(layout => `layouts=${layout}`).join(' ');
+    const newCommand = `[backgroundlayoutgroup ${newLayoutParams}${clipParam}]`;
+    
+    // 替换原命令
+    rawLine = rawLine.substring(0, startIdx) + newCommand + rawLine.substring(endIdx + 1);
+    
+    return rawLine;
+  };
+
   // 保存编辑
   const handleSaveEdit = () => {
     if (editedCard && editingCard) {
+      // 验证已通过 canSaveCommand 状态控制，不再需要这里的验证
       let updatedCard: CommandCard;
       
       if (editMode === 'raw') {
@@ -651,8 +791,17 @@ export const App: React.FC = () => {
   };
 
   // 编辑器内容变更
-  const handleEditorChange = (updatedCard: CommandCard) => {
-    setEditedCard(updatedCard);
+  const handleEditorChange = (updatedCard: CommandCard, isValid?: boolean) => {
+    // 重新生成卡片标题
+    const updatedCardWithTitle = {
+      ...updatedCard,
+      title: generateCardTitle(updatedCard)  // 传递完整的card对象
+    };
+    setEditedCard(updatedCardWithTitle);
+    // 如果编辑器提供了验证状态，就使用它
+    if (isValid !== undefined) {
+      setCanSaveEdit(isValid);
+    }
   };
 
   // 智能更新命令文本 - 只替换修改过的部分
@@ -668,6 +817,14 @@ export const App: React.FC = () => {
     // 如果没有原始文本，生成新的
     if (!updatedText) {
       console.log('📝 无原始文本，生成新命令');
+      return generateFullCommandText(editedCard);
+    }
+    
+    // 检查参数数量是否变化（有参数被删除或添加）
+    const originalParamKeys = Object.keys(originalCard.params);
+    const editedParamKeys = Object.keys(editedCard.params);
+    if (originalParamKeys.length !== editedParamKeys.length) {
+      console.log('📝 参数数量变化，重建命令');
       return generateFullCommandText(editedCard);
     }
     
@@ -827,6 +984,18 @@ export const App: React.FC = () => {
           onChange={(data) => setEditingItemData(data)}
         />
       );
+    } else if (commandType === 'backgroundlayoutgroup') {
+      return (
+        <BackgroundLayoutGroupItemEditor
+          id={editingItemData.id || ''}
+          onChange={(id: string) => {
+            setEditingItemData({ id });
+          }}
+          onValidate={(isValid: boolean) => {
+            setCanSaveGroupItem(isValid);
+          }}
+        />
+      );
     }
     // 未来可以添加其他类型的编辑器
     
@@ -877,6 +1046,9 @@ export const App: React.FC = () => {
     } else if (card.type === 'actorlayoutgroup') {
       props.onEditItem = (index: number) => handleEditGroupItem(card, index, 'actorlayout');
       props.onAddItem = () => handleAddGroupItem(card, 'actorlayout');
+    } else if (card.type === 'backgroundlayoutgroup') {
+      props.onEditItem = (index: number) => handleEditGroupItem(card, index, 'backgroundlayout');
+      // backgroundlayoutgroup 不提供添加功能，添加背景应该在 backgroundgroup 中进行
     }
     // 未来可以为其他 group 类型添加支持
     
@@ -1002,6 +1174,7 @@ export const App: React.FC = () => {
             isOpen={!!editingCard}
             onClose={handleCancelEdit}
             onSave={handleSaveEdit}
+            canSave={canSaveEdit}
           >
             {editMode === 'clip' ? (
               <ClipEditor card={editedCard} onChange={handleEditorChange} />
@@ -1027,6 +1200,7 @@ export const App: React.FC = () => {
             isOpen={true}
             onClose={handleCancelGroupItem}
             onSave={handleSaveGroupItem}
+            canSave={canSaveGroupItem}
           >
             {renderGroupItemEditor(editingCard.type)}
           </EditDialog>

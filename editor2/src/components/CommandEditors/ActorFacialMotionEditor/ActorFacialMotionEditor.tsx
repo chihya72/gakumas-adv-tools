@@ -3,7 +3,7 @@ import { CommandCard } from '../../../types/command-card';
 import { parseActorGroup } from '../../App/renderers/parserHelpers';
 import '../../FormEditor/FormEditor.css';
 
-interface ActorMotionEditorProps {
+interface ActorFacialMotionEditorProps {
   card: CommandCard;
   onChange: (updatedCard: CommandCard, isValid?: boolean) => void;
 }
@@ -16,11 +16,12 @@ interface Motion {
   action_type: string | null;
 }
 
-/** 角色动作命令编辑器 */
-export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onChange }) => {
+/** 角色表情命令编辑器 */
+export const ActorFacialMotionEditor: React.FC<ActorFacialMotionEditorProps> = ({ card, onChange }) => {
   const [formData, setFormData] = useState({
     id: card.params.id || '',
     motion: card.params.motion || '',
+    transition: card.params.transition !== undefined ? card.params.transition : 0,
   });
   
   const [availableActorIds, setAvailableActorIds] = useState<string[]>([]);
@@ -28,12 +29,9 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
   const [loadingMotions, setLoadingMotions] = useState(false);
   const [motionError, setMotionError] = useState<string | null>(null);
 
-  // 从全局获取可用的角色ID列表（需要从context或其他方式获取所有cards）
-  // 这里暂时使用简化方式，实际应该从App传入或从context获取
+  // 从全局获取可用的角色ID列表
   useEffect(() => {
-    // 尝试从window获取cards数据（临时方案）
     const getAllCards = (): CommandCard[] => {
-      // 这是一个临时解决方案，理想情况下应该通过context或props传递
       return (window as any).__editorCards || [];
     };
     
@@ -54,7 +52,7 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
     setAvailableActorIds(actorIds);
   }, []);
 
-  // 加载动作列表
+  // 加载表情动作列表（使用facial类型）
   useEffect(() => {
     loadMotions();
   }, []);
@@ -63,8 +61,8 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
     setLoadingMotions(true);
     setMotionError(null);
     try {
-      // 获取角色动作和通用动作
-      const response = await fetch('http://localhost:5000/api/resources/motions?motion_type=character');
+      // 获取表情动作
+      const response = await fetch('http://localhost:5000/api/resources/motions?motion_type=facial');
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -72,10 +70,10 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
       if (data.success) {
         setMotions(data.data);
       } else {
-        throw new Error('加载动作列表失败');
+        throw new Error('加载表情列表失败');
       }
     } catch (err) {
-      console.error('加载动作列表失败:', err);
+      console.error('加载表情列表失败:', err);
       setMotionError(err instanceof Error ? err.message : '加载失败，请确保 Database API 服务器已启动');
     } finally {
       setLoadingMotions(false);
@@ -91,6 +89,7 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
         ...card.params,
         id: formData.id,
         motion: formData.motion,
+        transition: formData.transition,
       },
     }, isValid);
   }, [formData]);
@@ -123,9 +122,9 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
       </div>
 
       <div className="form-field">
-        <label className="form-label">动作名称 (motion)</label>
+        <label className="form-label">表情名称 (motion)</label>
         {loadingMotions ? (
-          <div className="form-loading">加载动作列表中...</div>
+          <div className="form-loading">加载表情列表中...</div>
         ) : motionError ? (
           <div className="form-error">
             <p>{motionError}</p>
@@ -141,7 +140,7 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
             disabled={motions.length === 0}
           >
             <option value="">
-              {motions.length > 0 ? '请选择动作...' : '无可用动作，请启动 Database API'}
+              {motions.length > 0 ? '请选择表情...' : '无可用表情，请启动 Database API'}
             </option>
             {motions.map((motion) => (
               <option key={motion.id} value={motion.motion_name}>
@@ -154,12 +153,24 @@ export const ActorMotionEditor: React.FC<ActorMotionEditorProps> = ({ card, onCh
         )}
         <div className="form-help-text">
           {motions.length > 0 
-            ? '从数据库中选择动作资源'
+            ? '从数据库中选择表情资源'
             : '⚠️ 需要启动 Database API 服务器 (python resource_api_server.py)'
           }
         </div>
       </div>
+
+      <div className="form-field">
+        <label className="form-label">过渡时间 (transition)</label>
+        <input
+          type="number"
+          className="form-input"
+          value={formData.transition}
+          onChange={(e) => setFormData({ ...formData, transition: parseFloat(e.target.value) || 0 })}
+          step="0.1"
+          min="0"
+        />
+        <div className="form-help-text">表情切换的过渡时间（秒）</div>
+      </div>
     </div>
   );
 };
-

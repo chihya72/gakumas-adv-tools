@@ -157,7 +157,7 @@ export function createCardFromCommand(
 }
 
 /** 生成卡片标题 */
-function generateCardTitle(command: BaseCommand): string {
+export function generateCardTitle(command: BaseCommand): string {
   const type = command.type;
   const params = command.params;
 
@@ -216,7 +216,16 @@ function generateCardTitle(command: BaseCommand): string {
       }
       return `背景: ${params.id || params.src || "未知"}`;
     case CommandType.BackgroundSetting:
-      // 2D 背景设置
+      // 2D 背景设置 - 显示位置信息
+      try {
+        const setting = params.setting ? JSON.parse(params.setting) : null;
+        if (setting?.position) {
+          const pos = setting.position;
+          return `2D背景: ${params.id || '未知'} (${pos.x?.toFixed(1)}, ${pos.y?.toFixed(1)})`;
+        }
+      } catch (e) {
+        // 解析失败，使用默认显示
+      }
       return `2D背景设置: ${params.id || "未知"}`;
     case 'backgroundlayoutgroup':
       // 3D 背景布局组
@@ -234,9 +243,19 @@ function generateCardTitle(command: BaseCommand): string {
     case CommandType.Se:
       return `音效: ${params.se}`;
     case CommandType.Fade:
-      return `淡入淡出`;
+      const from = params.from !== undefined ? params.from : '?';
+      const to = params.to !== undefined ? params.to : '?';
+      return `淡入淡出: ${from} → ${to}`;
     case CommandType.Transition:
-      return `场景过渡`;
+      const transitionName = params.transition ? params.transition.replace('ttn_adv_transition_', '') : '?';
+      const transitionType = params.type || '?';
+      const isEventType = params.transition === 'ttn_adv_transition_event_change' || params.transition === 'ttn_adv_transition_event_time';
+      if (isEventType) {
+        return `场景过渡: ${transitionName} (${transitionType})`;
+      } else {
+        const transitionChar = params.character || '(未选择)';
+        return `场景过渡: ${transitionName} (${transitionType}) - ${transitionChar}`;
+      }
     case CommandType.Shake:
       return `震动`;
     case CommandType.Dof:

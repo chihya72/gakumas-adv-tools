@@ -6,6 +6,7 @@ interface EditDialogProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: () => void;
+  canSave?: boolean; // 是否允许保存，默认为 true
   children: React.ReactNode;
 }
 
@@ -14,6 +15,7 @@ export const EditDialog: React.FC<EditDialogProps> = ({
   isOpen,
   onClose,
   onSave,
+  canSave = true, // 默认为 true
   children,
 }) => {
   if (!isOpen) return null;
@@ -42,7 +44,12 @@ export const EditDialog: React.FC<EditDialogProps> = ({
           <button className="edit-dialog-btn edit-dialog-btn-cancel" onClick={onClose}>
             取消
           </button>
-          <button className="edit-dialog-btn edit-dialog-btn-save" onClick={onSave}>
+          <button 
+            className="edit-dialog-btn edit-dialog-btn-save" 
+            onClick={onSave}
+            disabled={!canSave}
+            title={!canSave ? '请填写所有必填字段' : ''}
+          >
             保存
           </button>
         </div>

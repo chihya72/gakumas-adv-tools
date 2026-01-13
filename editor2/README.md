@@ -87,9 +87,35 @@ npm run build
 - 右侧面板显示完整的命令详情
 - 包括时间轴信息、所有参数、原始命令
 
-### 6. 编辑和删除
-- 点击卡片上的 ✏️ 按钮编辑（待实现）
-- 点击 🗑️ 按钮删除命令
+### 6. 编辑命令
+
+编辑器现已支持多种命令的可视化编辑：
+
+#### 简单参数命令
+- **fade**: 编辑淡入淡出的from和to值
+- **actormotion**: 选择角色和动作（从actorgroup和Database API）
+- **actorfacialmotion**: 选择角色和表情，设置过渡时间
+- **backgroundsetting**: 选择2D背景，调整位置、缩放、角度
+
+#### 对话命令
+- **message/narration**: 编辑对话文本和说话者
+
+#### 复杂参数命令
+- **camerasetting**: 编辑相机焦距、位置、旋转等参数
+
+#### Group命令
+- **backgroundgroup**: 添加、编辑、删除背景项
+- **actorgroup**: 添加、编辑、删除角色项
+- **actorlayoutgroup**: 添加、编辑、删除角色布局
+
+点击卡片右上角的 ✏️ 按钮即可打开编辑对话框。
+
+**依赖检查**：某些命令需要前置条件：
+- actormotion/actorfacialmotion 需要先定义 actorgroup
+- backgroundsetting 需要先定义 backgroundgroup
+- Database API 需要启动才能使用下拉选择功能
+
+### 7. 删除命令
 
 ## 🎯 排序规则
 
@@ -480,7 +506,17 @@ const sortKey = command.clip
 
 - [ ] 某些复杂嵌套的 JSON 参数可能解析不完整
 - [ ] 大文件（1000+ 命令）可能有性能问题
-- [ ] 编辑功能尚未实现
+
+## ✅ 最新更新
+
+### v2.1.0 (2026年1月12日)
+- ✅ 新增 Fade 编辑器（编辑 from/to 参数）
+- ✅ 新增 ActorMotion 编辑器（支持从 actorgroup 选择角色，从 Database API 选择动作）
+- ✅ 新增 ActorFacialMotion 编辑器（支持表情选择和 transition 参数）
+- ✅ 新增 BackgroundSetting 编辑器（支持 2D 背景位置、缩放、角度调整）
+- ✅ 强制依赖验证：未定义 group 时禁用相关命令编辑
+- ✅ 优化编辑器界面：去除多余边框，界面更简洁
+- ✅ Database API 集成：支持从数据库选择动作和表情资源
 
 ## 📧 联系方式
 
@@ -488,6 +524,6 @@ const sortKey = command.clip
 
 ---
 
-**最后更新**: 2026年1月3日  
-**版本**: 2.0.0  
+**最后更新**: 2026年1月12日  
+**版本**: 2.1.0  
 **状态**: 🚀 持续开发中

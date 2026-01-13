@@ -119,8 +119,14 @@
   color: white;
 }
 
-.edit-dialog-btn-save:hover {
+.edit-dialog-btn-save:hover:not(:disabled) {
   background: #0098ff;
+}
+
+.edit-dialog-btn-save:disabled {
+  background: #999;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 /* 移动端适配 */

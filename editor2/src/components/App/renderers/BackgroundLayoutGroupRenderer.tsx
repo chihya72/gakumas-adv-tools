@@ -4,10 +4,10 @@ import { parseBackgroundLayoutGroup } from './parserHelpers';
 
 interface Props {
   params: Record<string, any>;
-  onEdit?: () => void;
+  onEditItem?: (index: number) => void;
 }
 
-const BackgroundLayoutGroupRenderer: React.FC<Props> = ({ params, onEdit }) => {
+const BackgroundLayoutGroupRenderer: React.FC<Props> = ({ params, onEditItem }) => {
   const layouts = parseBackgroundLayoutGroup(params);
   
   if (layouts.length === 0) return null;
@@ -17,9 +17,9 @@ const BackgroundLayoutGroupRenderer: React.FC<Props> = ({ params, onEdit }) => {
       {layouts.map((layout, index) => (
         <ParamCard 
           key={index} 
-          title="背景布局"
+          title="3D背景布局"
           index={layouts.length > 1 ? index + 1 : undefined}
-          onEdit={onEdit}
+          onEdit={onEditItem ? () => onEditItem(index) : undefined}
         >
           <ParamRow label="背景ID" value={layout.id} />
         </ParamCard>

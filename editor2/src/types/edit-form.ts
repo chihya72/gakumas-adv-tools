@@ -41,6 +41,10 @@ export interface FormField {
   options?: Array<{ label: string; value: any }>;
   /** 帮助文本 */
   helpText?: string;
+  /** 是否禁用 */
+  disabled?: boolean;
+  /** 提示文本（显示在字段下方） */
+  hint?: string;
 }
 
 /** 表单节点 - 可以是字段或分组 */
