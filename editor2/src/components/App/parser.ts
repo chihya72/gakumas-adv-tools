@@ -180,11 +180,31 @@ export function parseAdvScript(content: string): BaseCommand[] {
       
       // 特殊处理：对于 actorgroup 的 actors 参数
       if (commandType === 'actorgroup') {
-        const actorsMatches = paramsStr.matchAll(/actors=\[([^\]]+)\]/g);
         const allActors: string[] = [];
-        for (const match of actorsMatches) {
-          allActors.push(match[1]);
+        let i = 0;
+        
+        while (i < paramsStr.length) {
+          const actorIndex = paramsStr.indexOf('actors=[', i);
+          if (actorIndex === -1) break;
+          
+          let start = actorIndex + 'actors=['.length;
+          let depth = 1;
+          let end = start;
+          
+          while (end < paramsStr.length && depth > 0) {
+            if (paramsStr[end] === '[') depth++;
+            else if (paramsStr[end] === ']') depth--;
+            end++;
+          }
+          
+          if (depth === 0) {
+            const actorContent = paramsStr.substring(start, end - 1);
+            allActors.push(actorContent);
+          }
+          
+          i = end;
         }
+        
         if (allActors.length > 0) {
           params['actors'] = allActors.join('|||');
         }
@@ -249,15 +269,8 @@ export function parseAdvScript(content: string): BaseCommand[] {
           params['layouts'] = allLayouts.join('|||');
         }
         
-        // 解析其他参数（如 reset）
-        const paramRegex = /(\w+)=(?:([^\s\[\]]+)(?!\w))/g;
-        let paramMatch;
-        
-        while ((paramMatch = paramRegex.exec(paramsStr)) !== null) {
-          const [, key, value] = paramMatch;
-          if (key === 'layouts') continue; // 跳过layouts，已经特殊处理
-          params[key] = value;
-        }
+        // 不再解析其他参数，因为 layouts 后面通常只有 clip
+        // 如果有其他参数（如 reset），需要单独处理
       } else if (commandType === 'message' || commandType === 'select') {
         // 特殊处理：对于 message 和 select 的 text 参数（可能包含空格）
         const textMatch = paramsStr.match(/text=(.+?)(?:\s+\w+=|\s+clip=|$)/);

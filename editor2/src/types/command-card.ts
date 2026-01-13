@@ -163,18 +163,14 @@ export function generateCardTitle(command: BaseCommand): string {
 
   switch (type) {
     case CommandType.Message:
-    case 'message':
       return `💬 对话 - ${params.name || "未知"}: ${truncateText(params.text, 30)}`;
     case CommandType.Narration:
-    case 'narration':
       return `📖 旁白: ${truncateText(params.text, 30)}`;
     case CommandType.ChoiceGroup:
-    case 'choicegroup':
       // 尝试解析选项数量
       const choicesCount = (params.choices || '').split('|||').filter((c: string) => c.trim()).length;
       return `🔘 选项 (${choicesCount}个)`;
     case CommandType.Dialogue:
-    case 'dialogue':
       // 兼容性处理：根据 params 判断具体类型
       if (params.name) return `💬 对话 - ${params.name}: ${truncateText(params.text, 30)}`;
       return `📖 旁白: ${truncateText(params.text, 30)}`;
@@ -271,6 +267,8 @@ export function generateCardTitle(command: BaseCommand): string {
       return `角色布局`;
     case 'actorlooktarget':
       return `视线目标: ${params.id || "未知"}`;
+    case 'actoradditivemotion':
+      return `角色附加动作: ${params.motion || "未知"}`;
     default:
       return `${type}`;
   }
@@ -421,7 +419,7 @@ export function formatTime(seconds: number): string {
 }
 
 /** 获取命令的图标 */
-export function getCommandIcon(type: string): string {
+export function getCommandIcon(_type: string): string {
   return "";
 }
 

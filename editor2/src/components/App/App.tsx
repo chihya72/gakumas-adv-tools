@@ -14,6 +14,7 @@ import ActorItemEditor from '../CommandEditors/ActorItemEditor/ActorItemEditor';
 import ActorLayoutItemEditor from '../CommandEditors/ActorLayoutItemEditor/ActorLayoutItemEditor';
 import { BackgroundLayoutGroupItemEditor } from '../GroupEditors/BackgroundLayoutGroupItemEditor';
 import { useEditorContext } from '../../context/EditorContext';
+import { exportScriptToFile } from './serializer';
 import '../App.css';
 
 export const App: React.FC = () => {
@@ -252,9 +253,9 @@ export const App: React.FC = () => {
         const parts = [];
         if (bg.id) parts.push(`id=${bg.id}`);
         if (bg.src) parts.push(`src=${bg.src}`);
-        return parts.join(' ');
+        return 'background ' + parts.join(' ');
       })
-      .join(' ||| ');
+      .join('|||');
     
     // 重新生成卡片标题
     const backgroundIds = backgrounds
@@ -378,9 +379,9 @@ export const App: React.FC = () => {
         if (actor.body) parts.push(`body=${actor.body}`);
         if (actor.face) parts.push(`face=${actor.face}`);
         if (actor.hair) parts.push(`hair=${actor.hair}`);
-        return parts.join(' ');
+        return 'actor ' + parts.join(' ');
       })
-      .join(' ||| ');
+      .join('|||');
     
     // 重新生成卡片标题
     const actorIds = actors
@@ -444,10 +445,10 @@ export const App: React.FC = () => {
       const parts = [];
       if (layout.id) parts.push(`id=${layout.id}`);
       if (layout.transform) {
-        // 生成转义的 JSON 字符串，格式为 \{...\}（只转义最外层大括号）
+        // 生成转义的 JSON 字符串，所有大括号都需要转义
         const transformStr = JSON.stringify(layout.transform)
-          .replace(/^\{/, '\\{')
-          .replace(/\}$/, '\\}');
+          .replace(/\{/g, '\\{')
+          .replace(/\}/g, '\\}');
         parts.push(`transform=${transformStr}`);
       }
       return `[actorlayout ${parts.join(' ')}]`;
@@ -461,19 +462,21 @@ export const App: React.FC = () => {
       ? `角色布局: ${layoutIds.join(', ')}` 
       : '角色布局: 未知';
     
-    // 更新 params.layouts 字符串
+    // 更新 params.layouts 字符串 - 使用完整转义的 JSON 字符串
     const newLayoutsParam = layouts
       .map((layout: any) => {
         const parts = [];
         if (layout.id) parts.push(`id=${layout.id}`);
         if (layout.transform) {
-          // 生成转义的 JSON 字符串（保留引号但加上反斜杠）
-          const transformStr = JSON.stringify(layout.transform).replace(/"/g, '\\"');
+          // 生成完全转义的 JSON 字符串（所有大括号都转义）
+          const transformStr = JSON.stringify(layout.transform)
+            .replace(/\{/g, '\\{')
+            .replace(/\}/g, '\\}');
           parts.push(`transform=${transformStr}`);
         }
-        return parts.join(' ');
+        return 'actorlayout ' + parts.join(' ');
       })
-      .join(' ||| ');
+      .join('|||');
     
     // 更新卡片
     const updatedCard: CommandCard = {
@@ -622,8 +625,8 @@ export const App: React.FC = () => {
     
     // 更新 params.layouts 字符串
     const newLayoutsParam = layouts
-      .map((layout: any) => `id=${layout.id}`)
-      .join(' ||| ');
+      .map((layout: any) => `backgroundlayout id=${layout.id}`)
+      .join('|||');
     
     // 更新卡片
     const updatedCard: CommandCard = {
@@ -907,6 +910,7 @@ export const App: React.FC = () => {
   };
 
   // 卡片删除
+  // @ts-ignore
   const handleCardDelete = (card: CommandCard) => {
     if (confirm('确定要删除这个命令吗?')) {
       setCards((prev) => prev.filter((c) => c.id !== card.id));
@@ -918,7 +922,19 @@ export const App: React.FC = () => {
 
   // 导出文件
   const handleExport = () => {
-    alert('导出功能待实现');
+    if (cards.length === 0) {
+      alert('没有可导出的内容');
+      return;
+    }
+
+    try {
+      // 使用当前文件名或默认名称
+      const exportFileName = fileName || 'export.txt';
+      exportScriptToFile(cards, exportFileName);
+    } catch (error) {
+      console.error('导出失败:', error);
+      alert('导出失败: ' + (error as Error).message);
+    }
   };
   
   // 辅助函数：获取项类型的显示名称

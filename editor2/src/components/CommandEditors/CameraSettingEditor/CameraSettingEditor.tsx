@@ -111,11 +111,14 @@ export const CameraSettingEditor: React.FC<CameraSettingEditorProps> = ({ card, 
         };
       } else if (key === 'dofActive') {
         newSetting.dofSetting = {
-          ...newSetting.dofSetting,
           active: value,
+          focalPoint: newSetting.dofSetting?.focalPoint,
+          fNumber: newSetting.dofSetting?.fNumber,
+          maxBlurSpread: newSetting.dofSetting?.maxBlurSpread,
         };
       } else if (key === 'focalPoint' || key === 'fNumber' || key === 'maxBlurSpread') {
         newSetting.dofSetting = {
+          active: newSetting.dofSetting?.active ?? false,
           ...newSetting.dofSetting,
           [key]: value,
         };

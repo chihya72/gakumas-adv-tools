@@ -16,6 +16,8 @@ import ActorLayoutGroupRenderer from './ActorLayoutGroupRenderer';
 import TransitionRenderer from './TransitionRenderer';
 import FadeRenderer from './FadeRenderer';
 import DialogueRenderer from './DialogueRenderer';
+import BgmPlayRenderer from './BgmPlayRenderer';
+import BgmStopRenderer from './BgmStopRenderer';
 import CommonParamsRenderer from './CommonParamsRenderer';
 
 export interface RendererProps {
@@ -48,6 +50,8 @@ export const RENDERER_MAP: Record<string, RendererComponent> = {
   message: DialogueRenderer,
   narration: DialogueRenderer,
   select: DialogueRenderer, // select 使用相同的对话渲染器
+  bgmplay: BgmPlayRenderer,
+  bgmstop: BgmStopRenderer,
 };
 
 /**
@@ -72,5 +76,7 @@ export {
   TransitionRenderer,
   FadeRenderer,
   DialogueRenderer,
+  BgmPlayRenderer,
+  BgmStopRenderer,
   CommonParamsRenderer,
 };
