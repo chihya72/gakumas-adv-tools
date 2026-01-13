@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Vector3Input } from '../../common';
 import '../../FormEditor/FormEditor.css';
 
 interface ActorLayoutItemEditorProps {
@@ -32,36 +33,6 @@ const ActorLayoutItemEditor: React.FC<ActorLayoutItemEditorProps> = ({
     onChange(localData);
   }, [localData]);
 
-  const updatePosition = (axis: 'x' | 'y' | 'z', value: number) => {
-    setLocalData(prev => ({
-      ...prev,
-      transform: {
-        ...prev.transform,
-        position: { ...prev.transform.position, [axis]: value },
-      },
-    }));
-  };
-
-  const updateRotation = (axis: 'x' | 'y' | 'z', value: number) => {
-    setLocalData(prev => ({
-      ...prev,
-      transform: {
-        ...prev.transform,
-        rotation: { ...prev.transform.rotation, [axis]: value },
-      },
-    }));
-  };
-
-  const updateScale = (axis: 'x' | 'y' | 'z', value: number) => {
-    setLocalData(prev => ({
-      ...prev,
-      transform: {
-        ...prev.transform,
-        scale: { ...prev.transform.scale, [axis]: value },
-      },
-    }));
-  };
-
   return (
     <div className="actor-layout-item-editor">
       <div className="form-field">
@@ -83,110 +54,39 @@ const ActorLayoutItemEditor: React.FC<ActorLayoutItemEditorProps> = ({
 
       <div className="form-section">
         <h4 style={{ margin: '16px 0 8px 0', fontSize: '14px', fontWeight: 600 }}>位置 (Position)</h4>
-        <div className="form-vector">
-          <div className="form-vector-item">
-            <label>X</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.position.x}
-              onChange={(e) => updatePosition('x', parseFloat(e.target.value) || 0)}
-              step="0.01"
-            />
-          </div>
-          <div className="form-vector-item">
-            <label>Y</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.position.y}
-              onChange={(e) => updatePosition('y', parseFloat(e.target.value) || 0)}
-              step="0.01"
-            />
-          </div>
-          <div className="form-vector-item">
-            <label>Z</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.position.z}
-              onChange={(e) => updatePosition('z', parseFloat(e.target.value) || 0)}
-              step="0.01"
-            />
-          </div>
-        </div>
+        <Vector3Input
+          value={localData.transform.position}
+          onChange={(position) => setLocalData({
+            ...localData,
+            transform: { ...localData.transform, position }
+          })}
+          step={0.01}
+        />
       </div>
 
       <div className="form-section">
         <h4 style={{ margin: '16px 0 8px 0', fontSize: '14px', fontWeight: 600 }}>旋转 (Rotation)</h4>
-        <div className="form-vector">
-          <div className="form-vector-item">
-            <label>X (度)</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.rotation.x}
-              onChange={(e) => updateRotation('x', parseFloat(e.target.value) || 0)}
-              step="1"
-            />
-          </div>
-          <div className="form-vector-item">
-            <label>Y (度)</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.rotation.y}
-              onChange={(e) => updateRotation('y', parseFloat(e.target.value) || 0)}
-              step="1"
-            />
-          </div>
-          <div className="form-vector-item">
-            <label>Z (度)</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.rotation.z}
-              onChange={(e) => updateRotation('z', parseFloat(e.target.value) || 0)}
-              step="1"
-            />
-          </div>
-        </div>
+        <Vector3Input
+          value={localData.transform.rotation}
+          onChange={(rotation) => setLocalData({
+            ...localData,
+            transform: { ...localData.transform, rotation }
+          })}
+          step={1}
+          labels={{ x: 'X (度)', y: 'Y (度)', z: 'Z (度)' }}
+        />
       </div>
 
       <div className="form-section">
         <h4 style={{ margin: '16px 0 8px 0', fontSize: '14px', fontWeight: 600 }}>缩放 (Scale)</h4>
-        <div className="form-vector">
-          <div className="form-vector-item">
-            <label>X</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.scale.x}
-              onChange={(e) => updateScale('x', parseFloat(e.target.value) || 1)}
-              step="0.1"
-            />
-          </div>
-          <div className="form-vector-item">
-            <label>Y</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.scale.y}
-              onChange={(e) => updateScale('y', parseFloat(e.target.value) || 1)}
-              step="0.1"
-            />
-          </div>
-          <div className="form-vector-item">
-            <label>Z</label>
-            <input
-              type="number"
-              className="form-input-small"
-              value={localData.transform.scale.z}
-              onChange={(e) => updateScale('z', parseFloat(e.target.value) || 1)}
-              step="0.1"
-            />
-          </div>
-        </div>
+        <Vector3Input
+          value={localData.transform.scale}
+          onChange={(scale) => setLocalData({
+            ...localData,
+            transform: { ...localData.transform, scale }
+          })}
+          step={0.1}
+        />
       </div>
     </div>
   );

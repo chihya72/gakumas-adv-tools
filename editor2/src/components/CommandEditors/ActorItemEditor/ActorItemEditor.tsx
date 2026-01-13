@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useCharacters, useModels } from '../../../hooks/useResourceAPI';
+import { LoadingState, ErrorState } from '../../common';
 import '../../FormEditor/FormEditor.css';
 
 interface ActorItemEditorProps {
@@ -7,13 +9,6 @@ interface ActorItemEditorProps {
   face: string;
   hair: string;
   onChange: (data: { id: string; body: string; face: string; hair: string }) => void;
-}
-
-interface Model {
-  id: number;
-  model_name: string;
-  model_type: string;
-  character_id?: string;
 }
 
 // 角色ID到中文名的映射
@@ -40,85 +35,52 @@ const CHARACTER_NAMES: Record<string, string> = {
 
 const ActorItemEditor: React.FC<ActorItemEditorProps> = ({ id, body, face, hair, onChange }) => {
   const [localData, setLocalData] = useState({ id, body, face, hair });
-  const [bodyModels, setBodyModels] = useState<Model[]>([]);
-  const [faceModels, setFaceModels] = useState<Model[]>([]);
-  const [hairModels, setHairModels] = useState<Model[]>([]);
-  const [allCharacters, setAllCharacters] = useState<string[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data: allCharacters, loading: loadingChars, error: errorChars } = useCharacters();
+  const { 
+    data: bodyModels, 
+    loading: loadingBody, 
+    error: errorBody, 
+    reload: reloadBody 
+  } = useModels(localData.id, 'body');
+  const { 
+    data: faceModels, 
+    loading: loadingFace, 
+    error: errorFace, 
+    reload: reloadFace 
+  } = useModels(localData.id, 'face');
+  const { 
+    data: hairModels, 
+    loading: loadingHair, 
+    error: errorHair, 
+    reload: reloadHair 
+  } = useModels(localData.id, 'hair');
 
   // 通知父组件变更
   useEffect(() => {
     onChange(localData);
   }, [localData]);
 
-  // 加载角色列表
+  // 当角色列表加载完成且没有选中角色时，自动选择第一个
   useEffect(() => {
-    const loadCharacters = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/characters');
-        const data = await response.json();
-        
-        if (data.success && data.data) {
-          setAllCharacters(data.data);
-          // 如果当前没有选中角色且有角色列表，选择第一个
-          if (!localData.id && data.data.length > 0) {
-            handleIdChange(data.data[0]);
-          }
-        }
-      } catch (error) {
-        console.error('加载角色列表失败:', error);
-      }
-    };
-
-    loadCharacters();
-  }, []);
-
-  // 当角色ID变更时，重新加载模型列表
-  useEffect(() => {
-    if (localData.id) {
-      loadModels(localData.id);
+    if (!localData.id && allCharacters.length > 0) {
+      handleIdChange(allCharacters[0]);
     }
-  }, [localData.id]);
-
-  const loadModels = async (characterId: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      // 加载 body 模型
-      const bodyResponse = await fetch(
-        `http://localhost:5000/api/resources/models?character_id=${characterId}&model_type=body`
-      );
-      if (!bodyResponse.ok) throw new Error(`HTTP ${bodyResponse.status}`);
-      const bodyData = await bodyResponse.json();
-      if (bodyData.success) setBodyModels(bodyData.data);
-
-      // 加载 face 模型
-      const faceResponse = await fetch(
-        `http://localhost:5000/api/resources/models?character_id=${characterId}&model_type=face`
-      );
-      if (!faceResponse.ok) throw new Error(`HTTP ${faceResponse.status}`);
-      const faceData = await faceResponse.json();
-      if (faceData.success) setFaceModels(faceData.data);
-
-      // 加载 hair 模型
-      const hairResponse = await fetch(
-        `http://localhost:5000/api/resources/models?character_id=${characterId}&model_type=hair`
-      );
-      if (!hairResponse.ok) throw new Error(`HTTP ${hairResponse.status}`);
-      const hairData = await hairResponse.json();
-      if (hairData.success) setHairModels(hairData.data);
-    } catch (err) {
-      console.error('加载模型列表失败:', err);
-      setError(err instanceof Error ? err.message : '加载失败，请确保 Database API 服务器已启动');
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [allCharacters]);
 
   const handleIdChange = (newId: string) => {
     setLocalData({ id: newId, body: '', face: '', hair: '' });
   };
+
+  const loading = loadingBody || loadingFace || loadingHair;
+  const error = errorBody || errorFace || errorHair;
+  const reload = () => {
+    reloadBody();
+    reloadFace();
+    reloadHair();
+  };
+
+  if (loadingChars) return <LoadingState message="加载角色列表中..." />;
+  if (errorChars) return <ErrorState message={errorChars} details="请确保 Database API 服务器已启动" />;
 
   return (
     <div className="actor-item-editor">
@@ -146,14 +108,9 @@ const ActorItemEditor: React.FC<ActorItemEditorProps> = ({ id, body, face, hair,
       {localData.id && (
         <>
           {loading ? (
-            <div className="form-loading">加载模型列表中...</div>
+            <LoadingState message="加载模型列表中..." />
           ) : error ? (
-            <div className="form-error">
-              <p>{error}</p>
-              <button className="form-retry-btn" onClick={() => loadModels(localData.id)}>
-                重试
-              </button>
-            </div>
+            <ErrorState message={error} onRetry={reload} details="请确保 Database API 服务器已启动" />
           ) : (
             <>
               <div className="form-field">

@@ -13,11 +13,11 @@ import BackgroundItemEditor from '../CommandEditors/BackgroundItemEditor/Backgro
 import ActorItemEditor from '../CommandEditors/ActorItemEditor/ActorItemEditor';
 import ActorLayoutItemEditor from '../CommandEditors/ActorLayoutItemEditor/ActorLayoutItemEditor';
 import { BackgroundLayoutGroupItemEditor } from '../GroupEditors/BackgroundLayoutGroupItemEditor';
+import { useEditorContext } from '../../context/EditorContext';
 import '../App.css';
 
 export const App: React.FC = () => {
-  const [cards, setCards] = useState<CommandCard[]>([]);
-  const [selectedCard, setSelectedCard] = useState<CommandCard | null>(null);
+  const { cards, setCards, selectedCard, setSelectedCard } = useEditorContext();
   const [fileName, setFileName] = useState<string>('');
   const [isClosing, setIsClosing] = useState<boolean>(false);
   
@@ -31,14 +31,6 @@ export const App: React.FC = () => {
   const [editingItemData, setEditingItemData] = useState<Record<string, any>>({});
   const [canSaveGroupItem, setCanSaveGroupItem] = useState<boolean>(true); // Group项验证状态
   const [canSaveEdit, setCanSaveEdit] = useState<boolean>(true); // 通用编辑验证状态
-
-  // 将cards暴露给编辑器使用（通过window对象）
-  useEffect(() => {
-    (window as any).__editorCards = cards;
-    return () => {
-      delete (window as any).__editorCards;
-    };
-  }, [cards]);
 
   // 控制 body 滚动（竖屏模式）
   useEffect(() => {
